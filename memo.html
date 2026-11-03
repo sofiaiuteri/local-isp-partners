@@ -7,21 +7,60 @@
 <title>Memo · Signing up the long tail of small ISPs</title>
 <link rel="stylesheet" href="assets/style.css">
 <style>
-  .memo { max-width: 760px; margin: 0 auto; padding: 72px 24px 96px; }
-  .memo .eyebrow { font-size: 12px; color: var(--muted); }
-  .memo h1 { font-family: "Barlow Semi Condensed", sans-serif; font-weight: 500; text-transform: uppercase; letter-spacing: .03em; font-size: 44px; line-height: 1.05; margin: 14px 0 12px; }
-  .memo .byline { color: var(--muted); margin-bottom: 44px; }
-  .memo h2 { font-family: "Barlow Semi Condensed", sans-serif; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; font-size: 15px; color: var(--muted); margin: 52px 0 14px; padding-top: 22px; border-top: 1px solid var(--line); }
-  .memo p, .memo li { color: #d4d4d9; font-size: 16.5px; line-height: 1.7; }
-  .memo strong { color: #fff; font-weight: 500; }
-  .memo ul, .memo ol { padding-left: 20px; }
-  .memo li { margin-bottom: 8px; }
-  .memo table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 15px; }
-  .memo th, .memo td { text-align: left; padding: 12px 10px 12px 0; border-bottom: 1px solid var(--line); vertical-align: top; color: #d4d4d9; }
-  .memo th { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
-  .memo .tldr { border: 1px solid var(--line-2); padding: 22px 26px; }
-  .memo .tldr p { margin: 0; }
-  .memo .note { color: var(--dim); font-size: 13.5px; }
+  .m { max-width: 1040px; margin: 0 auto; padding: 64px 24px 90px; }
+  .m .eyebrow { font-size: 12px; color: var(--muted); }
+  .m h1 { font-weight: 500; letter-spacing: -0.025em; font-size: clamp(34px, 4.6vw, 52px); line-height: 1.05; margin: 14px 0 10px; }
+  .m .byline { color: var(--muted); margin-bottom: 34px; }
+  .tldr { border-left: 2px solid #fff; padding: 4px 0 4px 22px; font-size: 21px; font-weight: 300; line-height: 1.55; color: #e6e6ea; max-width: 820px; }
+  .tldr b { font-weight: 500; color: #fff; }
+  .blk { margin-top: 72px; }
+  .blk > .k { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+  .blk > h2 { font-weight: 500; letter-spacing: -0.015em; font-size: 28px; margin: 8px 0 22px; }
+  .stats3 { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .stats3 > div { padding: 26px 22px 26px 0; }
+  .stats3 .n { font-size: 48px; font-weight: 500; letter-spacing: -0.03em; line-height: 1; }
+  .stats3 .l { color: var(--muted); margin-top: 10px; font-size: 14.5px; max-width: 260px; }
+  .cards { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .cards.c2 { grid-template-columns: 1fr 1fr; } .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+  .cards > div { background: #000; padding: 22px 22px 24px; }
+  .cards .num { font-size: 12px; color: var(--muted); letter-spacing: .1em; }
+  .cards h3 { margin: 8px 0 6px; font-size: 18px; font-weight: 500; }
+  .cards p { margin: 0; color: #b3b3ba; font-size: 14.5px; line-height: 1.55; }
+  .tier .tag { display: inline-block; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; border: 1px solid var(--line-2); padding: 2px 8px; color: var(--muted); }
+  .tier dl { margin: 14px 0 0; display: grid; gap: 10px; font-size: 14.5px; }
+  .tier dt { color: var(--muted); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; }
+  .tier dd { margin: 2px 0 0; color: #e6e6ea; }
+  .bars { display: grid; gap: 4px; }
+  .hbar { display: grid; grid-template-columns: 300px 1fr 70px; gap: 16px; align-items: center; padding: 7px 0; }
+  .hbar .lab { color: #cfcfd4; font-size: 14.5px; }
+  .hbar .track { height: 20px; border-left: 1px solid var(--line-2); }
+  .hbar .fill { height: 100%; background: #d9d9de; border-radius: 0 4px 4px 0; }
+  .hbar .val { font-variant-numeric: tabular-nums; font-size: 15px; }
+  .hbar .val span { color: var(--muted); font-size: 12px; }
+  .callout { margin-top: 18px; border: 1px solid var(--line-2); padding: 16px 18px; color: #cfcfd4; font-size: 15px; }
+  .callout b { color: #fff; font-weight: 500; }
+  .flow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; border-top: 2px solid #fff; }
+  .flow > div { padding: 16px 14px 0 0; position: relative; }
+  .flow > div::before { content: ""; position: absolute; top: -7px; left: 0; width: 12px; height: 12px; border-radius: 50%; background: #fff; }
+  .flow .t { font-size: 16px; font-weight: 500; margin-top: 6px; }
+  .flow .d { color: var(--muted); font-size: 13.5px; margin-top: 4px; line-height: 1.5; }
+  .flow .who { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .timeline { display: grid; grid-template-columns: 2fr 3fr 1fr; gap: 2px; }
+  .timeline > div { background: var(--panel-2); border-top: 3px solid #fff; padding: 14px 16px 16px; }
+  .timeline .w { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .timeline .t { margin-top: 6px; color: #e6e6ea; font-size: 15px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .chips span { border: 1px solid var(--line-2); padding: 5px 11px; font-size: 13px; color: #cfcfd4; }
+  .qs { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .qs li { background: #000; padding: 18px 20px; font-size: 15px; color: #e6e6ea; }
+  .end { margin-top: 64px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .fine { color: var(--dim); font-size: 12.5px; margin-top: 14px; }
+  @media (max-width: 800px) {
+    .stats3, .cards.c2, .cards.c3, .qs, .timeline { grid-template-columns: 1fr; }
+    .flow { grid-template-columns: 1fr 1fr; row-gap: 26px; border-top: 0; }
+    .flow > div { border-top: 2px solid #fff; }
+    .hbar { grid-template-columns: 1fr 60px; } .hbar .track { grid-column: 1 / -1; grid-row: 2; }
+  }
 </style>
 </head>
 <body>
@@ -38,76 +77,99 @@
   </nav>
 </header>
 
-<article class="memo">
-  <div class="eyebrow caps">Memo · Concept</div>
+<article class="m">
+  <div class="eyebrow caps">Memo · Concept · 2-minute read</div>
   <h1>Signing up the long tail of small ISPs</h1>
-  <div class="byline">Sofia Iuteri, Washington and Lee University · October 2026</div>
+  <div class="byline">Sofia Iuteri, Washington and Lee University · November 2026</div>
 
-  <div class="tldr">
-    <p><strong>The short version.</strong> About 2,500 small ISPs serve 1.5 to 2 million customers, and almost all of them have addresses their own network can't reach. They're too small for a traditional reseller program, and too many to sign up one sales call at a time. I think the fix has two parts. The first is an offer built for them: no minimums, they keep the customer, and the pitch is about the homes they can't serve, not about reselling a competitor. The second is an agent-driven motion that researches every ISP, writes outreach a person approves, and makes sign-up self-serve. I built a working version for Virginia and propose a 6-week pilot there.</p>
+  <p class="tldr">Thousands of small ISPs can't reach every home they're asked to serve. They're <b>too small for a reseller program</b> and <b>too many to sign by hand</b>. The fix: an offer built for them, and <b>agents that do the research, outreach and onboarding</b>, tested first in a Virginia pilot.</p>
+
+  <section class="blk">
+    <div class="k">The opportunity</div>
+    <h2>Distribution through people rural customers already trust</h2>
+    <div class="stats3">
+      <div><div class="n">~2,500</div><div class="l">small independent ISPs across the US</div></div>
+      <div><div class="n">1.5–2M</div><div class="l">customers they serve combined</div></div>
+      <div><div class="n">Every one</div><div class="l">has a list of homes its own network can't reach</div></div>
+    </div>
+  </section>
+
+  <section class="blk">
+    <div class="k">Why it's been hard</div>
+    <h2>Four likely reasons, all fixable</h2>
+    <div class="cards c2">
+      <div><div class="num">01</div><h3>Built for bigger partners</h3><p>Reported reseller terms expected millions in annual revenue. An 800-customer ISP can't meet that.</p></div>
+      <div><div class="num">02</div><h3>Sounds like "help your competitor"</h3><p>Many small ISPs lose customers to Starlink. A reseller pitch gets ignored.</p></div>
+      <div><div class="num">03</div><h3>The math doesn't work by hand</h3><p>One sales call per tiny ISP costs more than the few dozen subscribers it brings.</p></div>
+      <div><div class="num">04</div><h3>Generic outreach</h3><p>Local owners answer emails that show you know their county, not templates.</p></div>
+    </div>
+  </section>
+
+  <section class="blk">
+    <div class="k">What 17 Virginia ISPs show</div>
+    <h2>The need is already visible on their own websites</h2>
+    <div class="bars" aria-label="Share of 17 researched Virginia ISPs with each signal">
+      <div class="hbar" title="12 of 17"><div class="lab">Mid-build on a state or federal grant</div><div class="track"><div class="fill" style="width:70.6%"></div></div><div class="val">12 <span>/ 17</span></div></div>
+      <div class="hbar" title="11 of 17"><div class="lab">Have an address checker (know who they turn away)</div><div class="track"><div class="fill" style="width:64.7%"></div></div><div class="val">11 <span>/ 17</span></div></div>
+      <div class="hbar" title="11 of 17"><div class="lab">Sell to businesses (backup-line upsell)</div><div class="track"><div class="fill" style="width:64.7%"></div></div><div class="val">11 <span>/ 17</span></div></div>
+      <div class="hbar" title="8 of 17"><div class="lab">Say terrain or line of sight limits them</div><div class="track"><div class="fill" style="width:47.1%"></div></div><div class="val">8 <span>/ 17</span></div></div>
+      <div class="hbar" title="1 of 17"><div class="lab">Already sell Starlink on their own</div><div class="track"><div class="fill" style="width:5.9%"></div></div><div class="val">1 <span>/ 17</span></div></div>
+    </div>
+    <div class="callout"><b>Piedmont Broadband (Sperryville)</b> already installs Starlink for $250 at homes its towers can't see. It gets paid once, and every month after goes to Starlink. A program would give it a reason to do this for every home on its list.</div>
+  </section>
+
+  <section class="blk">
+    <div class="k">The offer</div>
+    <h2>Three tiers, so a 300-customer WISP and a 10,000-member co-op can both say yes</h2>
+    <div class="cards c3">
+      <div class="tier"><span class="tag">Refer</span><dl><dt>They do</dt><dd>Send out-of-range addresses to a tracked link</dd><dt>They earn</dt><dd>A bounty per activation</dd></dl></div>
+      <div class="tier"><span class="tag">Install</span><dl><dt>They do</dt><dd>Sell, install, first-line support</dd><dt>They earn</dt><dd>Their own install fee plus a monthly share</dd></dl></div>
+      <div class="tier"><span class="tag">Resell</span><dl><dt>They do</dt><dd>Bill the customer under their own brand</dd><dt>They earn</dt><dd>A larger monthly share</dd></dl></div>
+    </div>
+    <div class="chips"><span>No fees</span><span>No minimums</span><span>They keep the customer</span><span>Can move customers to their own network later</span></div>
+    <p class="fine">Starlink would set the actual numbers. The prototype uses placeholders.</p>
+  </section>
+
+  <section class="blk">
+    <div class="k">The motion</div>
+    <h2>Agents do the volume. A person approves and takes the calls.</h2>
+    <div class="flow">
+      <div><div class="who">Agent</div><div class="t">Find</div><div class="d">Every small ISP in a county or state</div></div>
+      <div><div class="who">Agent</div><div class="t">Research</div><div class="d">Sourced profile in about a minute</div></div>
+      <div><div class="who">Agent</div><div class="t">Rank</div><div class="d">Fit score with the reasons shown</div></div>
+      <div><div class="who">Agent + person</div><div class="t">Reach out</div><div class="d">Personal email, approved before sending</div></div>
+      <div><div class="who">Agent + person</div><div class="t">Reply</div><div class="d">Sort replies, draft honest answers</div></div>
+      <div><div class="who">Self-serve</div><div class="t">Onboard</div><div class="d">Sign, train, demo kit, first customer</div></div>
+    </div>
+  </section>
+
+  <section class="blk">
+    <div class="k">Proposed pilot</div>
+    <h2>Virginia, six weeks</h2>
+    <div class="timeline">
+      <div><div class="w">Weeks 1–2</div><div class="t">Full Virginia list, profile and score every ISP, set offer terms</div></div>
+      <div><div class="w">Weeks 3–5</div><div class="t">Approved outreach to the top 50, calls handled by a person</div></div>
+      <div><div class="w">Week 6</div><div class="t">Results and a go / no-go</div></div>
+    </div>
+    <div class="chips"><span>Reply rate</span><span>Calls booked</span><span>Partners signed</span><span>First activations</span><span>Cost per ISP researched</span></div>
+  </section>
+
+  <section class="blk">
+    <div class="k">Only Starlink can answer</div>
+    <h2>Open questions</h2>
+    <ul class="qs">
+      <li>What tripped up the earlier attempt: the offer, the targeting or the outreach?</li>
+      <li>What can partners earn today, and who signs the agreement?</li>
+      <li>Is there a list of ISPs already contacted, or already reselling?</li>
+      <li>How should channel conflict work where Starlink sells direct?</li>
+    </ul>
+  </section>
+
+  <div class="end">
+    <a class="btn solid" href="index.html?tour=1">Take the 2-minute tour</a>
+    <a class="btn" href="console.html">Open the Partner Console</a>
   </div>
-
-  <h2>The opportunity</h2>
-  <p>Starlink is already the clear choice for rural and mobile customers. The hard part of reaching the rest of rural America is distribution, because many of those households trust a local provider that has served the county for decades. Those providers fall into four groups: fixed wireless ISPs, rural telephone companies and co-ops, electric co-ops that have moved into fiber, and small local fiber builders. Each has a few hundred to a few thousand customers, plus a list of homes it can't reach.</p>
-
-  <h2>Why this has probably been hard</h2>
-  <p>I don't know what happened with the earlier attempt, so these are my best guesses.</p>
-  <ol>
-    <li><strong>The program was built for bigger partners.</strong> Public reports describe a reseller program that expected a business plan for millions in annual revenue and paused new sign-ups in 2026. An ISP with 800 customers can't meet that bar.</li>
-    <li><strong>The pitch sounds like "help your competitor."</strong> Many small ISPs are losing customers to Starlink. If the first message is "become a Starlink reseller," a lot of them won't answer.</li>
-    <li><strong>The math doesn't work for a person.</strong> One sales call per 800-customer company is an expensive way to win a few dozen subscribers. The research, outreach and onboarding have to cost close to nothing per ISP.</li>
-    <li><strong>Generic outreach gets ignored.</strong> These are tight-knit, local businesses. An email that shows you know their county and their network gets read. A template doesn't.</li>
-  </ol>
-
-  <h2>What the Virginia research shows</h2>
-  <p>I researched 17 small Virginia providers from public sources: their own websites, state grant filings, and local news. A few patterns stood out:</p>
-  <ul>
-    <li><strong>11 of 17 have an address checker or availability form.</strong> They already know exactly which homes they turn away.</li>
-    <li><strong>12 of 17 are in the middle of grant-funded builds</strong> (VATI, BEAD, USDA, CARES Act). Those builds focus on specific areas and leave the hardest addresses for later.</li>
-    <li><strong>8 of 17 say terrain or line of sight limits them</strong>, mostly in the Blue Ridge and Southwest Virginia.</li>
-    <li><strong>11 of 17 sell to businesses</strong>, so a Starlink backup line is an easy add-on sale.</li>
-    <li><strong>One already sells Starlink on its own.</strong> Piedmont Broadband in Sperryville installs Starlink for $250 for homes that can't see its towers. It gets paid once, and the monthly relationship goes to Starlink. Some local ISPs are already doing this without any program, and a program would give them a reason to do more of it.</li>
-  </ul>
-
-  <h2>The offer</h2>
-  <p>I'd suggest three tiers, so a 300-customer WISP and a 10,000-member co-op can both say yes:</p>
-  <table>
-    <tr><th>Tier</th><th>What the ISP does</th><th>What it earns</th></tr>
-    <tr><td><strong>Refer</strong></td><td>Sends out-of-range addresses to a tracked Starlink link</td><td>A bounty per activation</td></tr>
-    <tr><td><strong>Install</strong></td><td>Sells, installs and does first-line support</td><td>Its own install fee plus a monthly share</td></tr>
-    <tr><td><strong>Resell</strong></td><td>Bills the customer under its own brand</td><td>A larger monthly share</td></tr>
-  </table>
-  <p>Every tier would have no fees and no minimums, the ISP keeps the customer relationship, and the ISP can move a customer onto its own network later. Starlink would set the actual numbers. The prototype's calculator uses placeholder values.</p>
-
-  <h2>The motion</h2>
-  <ol>
-    <li><strong>Find:</strong> start from the FCC's Broadband Data Collection, which lists every provider and the locations it serves, plus WISPA and NTCA member lists.</li>
-    <li><strong>Research:</strong> an agent profiles each ISP from public sources: coverage, technology, terrain, grants, address checkers, leadership. In the prototype this takes about a minute per company, and every fact links to its source.</li>
-    <li><strong>Rank:</strong> score each ISP on fit, with the reasons shown, so the team works the best ones first.</li>
-    <li><strong>Reach out:</strong> the agent drafts an email built on a real detail about the company. A person edits and approves every message.</li>
-    <li><strong>Convert:</strong> each ISP gets a personalized page with its own estimate, straight answers on channel conflict, and a 15-minute sign-up.</li>
-    <li><strong>Activate:</strong> training, a demo kit, and check-ins for partners who signed but haven't activated anyone yet.</li>
-  </ol>
-
-  <h2>Proposed pilot: Virginia, 6 weeks</h2>
-  <ul>
-    <li><strong>Weeks 1 to 2:</strong> build the full list of Virginia providers from FCC data, profile and score all of them, and finalize offer terms with the team.</li>
-    <li><strong>Weeks 3 to 5:</strong> approved outreach to the top 50, with calls handled by a person.</li>
-    <li><strong>Week 6:</strong> results and a decision.</li>
-  </ul>
-  <p>What I'd measure: reply rate, calls booked, partners signed, first activations, and research cost per ISP. A good result would show this works without a full-time salesperson per state. Then it rolls out state by state.</p>
-
-  <h2>What only Starlink can answer</h2>
-  <ul>
-    <li>What tripped up the earlier attempt: the offer, the targeting, or the outreach?</li>
-    <li>What can partners actually earn today (bounty, install fee, monthly share), and who signs the agreement?</li>
-    <li>Is there a list of ISPs already contacted, or already reselling, that a pilot should start from or skip?</li>
-    <li>How does the team want to handle channel conflict in areas where Starlink sells direct?</li>
-  </ul>
-
-  <h2>What I've built so far</h2>
-  <p>A working prototype: a <a href="console.html">Partner Console</a> with 17 researched Virginia ISPs, fit scores and editable drafts, a live research agent that profiles any ISP you name, and a <a href="partner.html">personalized partner page</a> for each one. ISP details come from public sources and are linked. Earnings figures and program terms are placeholders until Starlink sets them.</p>
-  <p class="note">This is an independent concept. It is not affiliated with or endorsed by SpaceX or Starlink.</p>
+  <p class="fine">Independent concept. Not affiliated with or endorsed by SpaceX or Starlink. ISP details come from public sources and are linked in the console.</p>
 </article>
 
 <div class="disclaimer">Concept prototype by Sofia Iuteri, Washington and Lee University. Not affiliated with or endorsed by SpaceX or Starlink.</div>
