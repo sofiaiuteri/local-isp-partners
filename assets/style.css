@@ -234,7 +234,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px;
 .case { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
 .case .eyebrow { margin-bottom: 14px; }
 .case p { color: #c9c9cf; font-size: 18px; font-weight: 300; max-width: 560px; }
-.case .quote { color: #fff; font-weight: 400; }
+.case .said { color: #fff; font-weight: 400; }
 .textlink { display: inline-block; margin-top: 10px; color: #fff; text-decoration: none; border-bottom: 1px solid var(--line-2); padding-bottom: 3px; }
 .textlink:hover { border-color: #fff; }
 .case-map { position: relative; aspect-ratio: 1 / 1; border: 1px solid var(--line); }

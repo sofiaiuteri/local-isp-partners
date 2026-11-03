@@ -48,7 +48,7 @@ Record:
 - Customer or subscriber count, only if a source states one, and which source.
 - The owner, CEO or general manager, with title, if publicly listed.
 - Signals relevant to a Starlink partnership, each a short factual sentence: an availability checker or waitlist; statements about line of sight, terrain or addresses they can't serve; business customers; their own install crew; recent grants (BEAD, VATI, ReConnect, RDOF, ARPA) and the build areas; anything they already say about Starlink or satellite.
-- An opening line for a partnership email: one or two warm sentences in second person ("you") about something specific and true about this company, like a milestone, a build, or how it started. Write like a person, not a marketer. No em dashes.
+- An opening line for a partnership email: one short, warm sentence (under 25 words) in second person ("you") about something specific and true about this company, like a milestone, a build, or how it started. Write like a person, not a marketer. No em dashes.
 - The URLs you used.`;
 
 export function POST(request) {

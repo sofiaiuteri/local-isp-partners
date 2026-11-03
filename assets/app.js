@@ -55,23 +55,19 @@
   function draft(isp) {
     const fn = firstName(isp.leader);
     const hi = isp.greeting || (fn ? "Hi " + fn + "," : "Hi there,");
-    const area = areaPhrase(isp);
     const hook = isp.opener || "";
     const subject = "The addresses in " + (isp.counties_served?.[0] || isp.county || "your area") + " you can't get to yet";
-    const problem = isp.pitch_para ||
-      "Every local provider I talk to has the same list: homes behind a ridge, at the end of a long lane, or just too far out to justify another tower or fiber run. Right now those folks either wait or go to Starlink on their own, and you never hear from them again.";
+    // Sales emails stay at 4 or 5 sentences. People skim.
     const body =
 `${hi}
 
-${hook} You know ${area} better than anyone, so I'll keep this short.
+${hook}
 
-${problem}
+We're piloting a Virginia partner program for the homes your network can't reach yet: you offer Starlink, keep the customer, and earn on the install and every month after, with no fees or minimums.
 
-We're piloting a local partner program in Virginia that flips that. You offer Starlink to the addresses you can't serve, you keep the customer relationship, and you earn on the install and every month after. No minimums, and the paperwork takes about 15 minutes.
+Here's an estimate for ${isp.name}: [partner link]
 
-I put together a page with an estimate for ${isp.name}: [partner link]
-
-Would a 15-minute call next week be worth it?
+Worth a 15-minute call next week?
 
 Starlink Local Partners, Virginia`;
     return { subject, body };

@@ -27,7 +27,7 @@ Read the ISP's reply and:
 - Sort it into one category.
 - Summarize what they said in one sentence, and list their specific concerns, if any.
 - Recommend the next step and the pipeline stage they should move to. Unsubscribe or a clear no means no further outreach.
-- Draft the reply. Answer their actual questions and concerns honestly, especially about channel conflict. Don't promise anything outside the program description above; if they ask about exact payouts, say final numbers come from Starlink and offer a call. Keep it short and warm, write like a person, and sign it "Starlink Local Partners, Virginia". No em dashes. If no reply should be sent (unsubscribe, hard no), write a one-line polite acknowledgment or leave the body empty.`;
+- Draft the reply. Answer their actual questions and concerns honestly, especially about channel conflict. Don't promise anything outside the program description above; if they ask about exact payouts, say final numbers come from Starlink and offer a call. Keep it to 4 sentences at most (people skim sales email), warm, written like a person, and sign it "Starlink Local Partners, Virginia". No em dashes. If no reply should be sent (unsubscribe, hard no), write a one-line polite acknowledgment or leave the body empty.`;
 
 export function POST(request) {
   return handle(request, async (body) => {
