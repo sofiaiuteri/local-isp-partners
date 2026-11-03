@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Memo · Signing up the long tail of small ISPs</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .memo { max-width: 760px; margin: 0 auto; padding: 72px 24px 96px; }
+  .memo .eyebrow { font-size: 12px; color: var(--muted); }
+  .memo h1 { font-family: "Barlow Semi Condensed", sans-serif; font-weight: 500; text-transform: uppercase; letter-spacing: .03em; font-size: 44px; line-height: 1.05; margin: 14px 0 12px; }
+  .memo .byline { color: var(--muted); margin-bottom: 44px; }
+  .memo h2 { font-family: "Barlow Semi Condensed", sans-serif; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; font-size: 15px; color: var(--muted); margin: 52px 0 14px; padding-top: 22px; border-top: 1px solid var(--line); }
+  .memo p, .memo li { color: #d4d4d9; font-size: 16.5px; line-height: 1.7; }
+  .memo strong { color: #fff; font-weight: 500; }
+  .memo ul, .memo ol { padding-left: 20px; }
+  .memo li { margin-bottom: 8px; }
+  .memo table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 15px; }
+  .memo th, .memo td { text-align: left; padding: 12px 10px 12px 0; border-bottom: 1px solid var(--line); vertical-align: top; color: #d4d4d9; }
+  .memo th { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+  .memo .tldr { border: 1px solid var(--line-2); padding: 22px 26px; }
+  .memo .tldr p { margin: 0; }
+  .memo .note { color: var(--dim); font-size: 13.5px; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="index.html"><span class="wordmark">STARLINK</span><span class="sub caps">Local Partners</span></a>
+  <span class="concept-tag">Concept by Sofia Iuteri · Not affiliated with Starlink</span>
+  <nav class="nav caps">
+    <a href="index.html">Overview</a>
+    <a href="memo.html" class="on">Memo</a>
+    <a href="console.html">Partner Console</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="partner.html">Partner Page</a>
+  </nav>
+</header>
+
+<article class="memo">
+  <div class="eyebrow caps">Memo · Concept</div>
+  <h1>Signing up the long tail of small ISPs</h1>
+  <div class="byline">Sofia Iuteri, Washington and Lee University · October 2026</div>
+
+  <div class="tldr">
+    <p><strong>The short version.</strong> About 2,500 small ISPs serve 1.5 to 2 million customers, and almost all of them have addresses their own network can't reach. They're too small for a traditional reseller program, and too many to sign up one sales call at a time. I think the fix has two parts. The first is an offer built for them: no minimums, they keep the customer, and the pitch is about the homes they can't serve, not about reselling a competitor. The second is an agent-driven motion that researches every ISP, writes outreach a person approves, and makes sign-up self-serve. I built a working version for Virginia and propose a 6-week pilot there.</p>
+  </div>
+
+  <h2>The opportunity</h2>
+  <p>Starlink is already the clear choice for rural and mobile customers. The hard part of reaching the rest of rural America is distribution, because many of those households trust a local provider that has served the county for decades. Those providers fall into four groups: fixed wireless ISPs, rural telephone companies and co-ops, electric co-ops that have moved into fiber, and small local fiber builders. Each has a few hundred to a few thousand customers, plus a list of homes it can't reach.</p>
+
+  <h2>Why this has probably been hard</h2>
+  <p>I don't know what happened with the earlier attempt, so these are my best guesses.</p>
+  <ol>
+    <li><strong>The program was built for bigger partners.</strong> Public reports describe a reseller program that expected a business plan for millions in annual revenue and paused new sign-ups in 2026. An ISP with 800 customers can't meet that bar.</li>
+    <li><strong>The pitch sounds like "help your competitor."</strong> Many small ISPs are losing customers to Starlink. If the first message is "become a Starlink reseller," a lot of them won't answer.</li>
+    <li><strong>The math doesn't work for a person.</strong> One sales call per 800-customer company is an expensive way to win a few dozen subscribers. The research, outreach and onboarding have to cost close to nothing per ISP.</li>
+    <li><strong>Generic outreach gets ignored.</strong> These are tight-knit, local businesses. An email that shows you know their county and their network gets read. A template doesn't.</li>
+  </ol>
+
+  <h2>What the Virginia research shows</h2>
+  <p>I researched 17 small Virginia providers from public sources: their own websites, state grant filings, and local news. A few patterns stood out:</p>
+  <ul>
+    <li><strong>11 of 17 have an address checker or availability form.</strong> They already know exactly which homes they turn away.</li>
+    <li><strong>12 of 17 are in the middle of grant-funded builds</strong> (VATI, BEAD, USDA, CARES Act). Those builds focus on specific areas and leave the hardest addresses for later.</li>
+    <li><strong>8 of 17 say terrain or line of sight limits them</strong>, mostly in the Blue Ridge and Southwest Virginia.</li>
+    <li><strong>11 of 17 sell to businesses</strong>, so a Starlink backup line is an easy add-on sale.</li>
+    <li><strong>One already sells Starlink on its own.</strong> Piedmont Broadband in Sperryville installs Starlink for $250 for homes that can't see its towers. It gets paid once, and the monthly relationship goes to Starlink. Some local ISPs are already doing this without any program, and a program would give them a reason to do more of it.</li>
+  </ul>
+
+  <h2>The offer</h2>
+  <p>I'd suggest three tiers, so a 300-customer WISP and a 10,000-member co-op can both say yes:</p>
+  <table>
+    <tr><th>Tier</th><th>What the ISP does</th><th>What it earns</th></tr>
+    <tr><td><strong>Refer</strong></td><td>Sends out-of-range addresses to a tracked Starlink link</td><td>A bounty per activation</td></tr>
+    <tr><td><strong>Install</strong></td><td>Sells, installs and does first-line support</td><td>Its own install fee plus a monthly share</td></tr>
+    <tr><td><strong>Resell</strong></td><td>Bills the customer under its own brand</td><td>A larger monthly share</td></tr>
+  </table>
+  <p>Every tier would have no fees and no minimums, the ISP keeps the customer relationship, and the ISP can move a customer onto its own network later. Starlink would set the actual numbers. The prototype's calculator uses placeholder values.</p>
+
+  <h2>The motion</h2>
+  <ol>
+    <li><strong>Find:</strong> start from the FCC's Broadband Data Collection, which lists every provider and the locations it serves, plus WISPA and NTCA member lists.</li>
+    <li><strong>Research:</strong> an agent profiles each ISP from public sources: coverage, technology, terrain, grants, address checkers, leadership. In the prototype this takes about a minute per company, and every fact links to its source.</li>
+    <li><strong>Rank:</strong> score each ISP on fit, with the reasons shown, so the team works the best ones first.</li>
+    <li><strong>Reach out:</strong> the agent drafts an email built on a real detail about the company. A person edits and approves every message.</li>
+    <li><strong>Convert:</strong> each ISP gets a personalized page with its own estimate, straight answers on channel conflict, and a 15-minute sign-up.</li>
+    <li><strong>Activate:</strong> training, a demo kit, and check-ins for partners who signed but haven't activated anyone yet.</li>
+  </ol>
+
+  <h2>Proposed pilot: Virginia, 6 weeks</h2>
+  <ul>
+    <li><strong>Weeks 1 to 2:</strong> build the full list of Virginia providers from FCC data, profile and score all of them, and finalize offer terms with the team.</li>
+    <li><strong>Weeks 3 to 5:</strong> approved outreach to the top 50, with calls handled by a person.</li>
+    <li><strong>Week 6:</strong> results and a decision.</li>
+  </ul>
+  <p>What I'd measure: reply rate, calls booked, partners signed, first activations, and research cost per ISP. A good result would show this works without a full-time salesperson per state. Then it rolls out state by state.</p>
+
+  <h2>What only Starlink can answer</h2>
+  <ul>
+    <li>What tripped up the earlier attempt: the offer, the targeting, or the outreach?</li>
+    <li>What can partners actually earn today (bounty, install fee, monthly share), and who signs the agreement?</li>
+    <li>Is there a list of ISPs already contacted, or already reselling, that a pilot should start from or skip?</li>
+    <li>How does the team want to handle channel conflict in areas where Starlink sells direct?</li>
+  </ul>
+
+  <h2>What I've built so far</h2>
+  <p>A working prototype: a <a href="console.html">Partner Console</a> with 17 researched Virginia ISPs, fit scores and editable drafts, a live research agent that profiles any ISP you name, and a <a href="partner.html">personalized partner page</a> for each one. ISP details come from public sources and are linked. Earnings figures and program terms are placeholders until Starlink sets them.</p>
+  <p class="note">This is an independent concept. It is not affiliated with or endorsed by SpaceX or Starlink.</p>
+</article>
+
+<div class="disclaimer">Concept prototype by Sofia Iuteri, Washington and Lee University. Not affiliated with or endorsed by SpaceX or Starlink.</div>
+<script src="data/isps.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/tour.js"></script>
+</body>
+</html>

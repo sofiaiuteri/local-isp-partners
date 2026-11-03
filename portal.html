@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Partner Portal · Starlink Local Partners</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="portal">
+
+<header class="topbar">
+  <a class="brand" href="index.html"><span class="wordmark">STARLINK</span><span class="sub caps">Partner Portal</span></a>
+  <span class="concept-tag">Concept by Sofia Iuteri · Not affiliated with Starlink</span>
+  <nav class="nav caps"><span id="who" style="color:var(--muted)"></span></nav>
+</header>
+
+<section class="p-head">
+  <div class="eyebrow caps" id="eyebrow">Local Partner Program · Virginia</div>
+  <h1 id="welcome">Welcome</h1>
+  <div class="progressbar"><i id="pbar"></i></div>
+  <p class="sub" id="progressText"></p>
+</section>
+
+<div class="samplebar slim" id="sampleBar"></div>
+<div class="p-grid">
+  <aside class="p-col">
+    <h4 class="caps">Getting started</h4>
+    <ol class="checklist" id="checklist"></ol>
+    <div class="p-note">Prototype. Program terms are a proposal, and nothing here reaches Starlink.</div>
+  </aside>
+
+  <main class="p-main">
+    <section class="p-card" id="agreement">
+      <div class="p-card-h"><h3>Partner agreement</h3><span class="pill" id="agStatus">Not signed</span></div>
+      <div class="ag-doc" id="agDoc"></div>
+      <div id="agSign" class="ag-sign">
+        <div class="grid2">
+          <div class="field"><label>Type your full name to sign</label><input id="sigName"></div>
+          <div class="field"><label>Title</label><input id="sigTitle"></div>
+        </div>
+        <label class="checks"><span><input type="checkbox" id="sigOk"> I'm authorized to sign for <b id="agCo2"></b> and agree to the terms above.</span></label>
+        <div class="form-nav"><button class="btn solid" id="signBtn" disabled>Sign agreement</button></div>
+      </div>
+      <div id="agSigned" class="ag-signed" hidden></div>
+    </section>
+
+    <section class="p-card" id="training">
+      <div class="p-card-h"><h3>Training and demo kit</h3><span class="pill" id="trStatus">To do</span></div>
+      <p class="muted">Book a 30-minute session on quoting, installs and support handoffs, and tell us where to ship your demo kit for a practice install.</p>
+      <div class="slots" id="slots"></div>
+      <div class="grid2" style="margin-top:18px">
+        <div class="field"><label>Ship demo kit to</label><input id="shipTo" placeholder="Street, town, VA ZIP"></div>
+        <div class="field" style="display:flex;align-items:flex-end"><button class="btn sm" id="shipBtn">Confirm address</button></div>
+      </div>
+      <label class="checks"><span><input type="checkbox" id="practice"> Our crew finished a practice install with the demo kit</span></label>
+    </section>
+
+    <section class="p-card" id="customers">
+      <div class="p-card-h"><h3>Customers</h3><span class="pill" id="custStatus">0 active</span></div>
+      <p class="muted">Quote Starlink for an address your network can't reach, or as a backup line for a business customer. Mark it installed once your crew is done.</p>
+      <div class="quote">
+        <input id="qAddr" placeholder="Customer address or name">
+        <select id="qType"><option>Residential</option><option>Business backup</option><option>Starlink Mini</option></select>
+        <button class="btn sm solid" id="qAdd">Add quote</button>
+      </div>
+      <table class="ctable"><thead><tr><th>Customer</th><th>Service</th><th>Status</th><th></th></tr></thead><tbody id="ctbody"></tbody></table>
+      <div class="pcode">Your partner code: <b id="pcode"></b> · customers who sign up online with it are credited to you</div>
+    </section>
+
+    <section class="p-card" id="earnings">
+      <div class="p-card-h"><h3>Earnings</h3><span class="pill">Illustrative</span></div>
+      <div class="e-grid">
+        <div><div class="n" id="eActive">0</div><div class="l">Active subscribers</div></div>
+        <div><div class="n" id="eInstall">$0</div><div class="l">Install fees earned</div></div>
+        <div><div class="n" id="eMonthly">$0</div><div class="l">Monthly share, per month</div></div>
+        <div><div class="n" id="eYear">$0</div><div class="l">Next 12 months at this pace</div></div>
+      </div>
+      <div class="e-set">
+        <label>Your install fee <input type="number" id="feeInstall" min="0" step="25"></label>
+        <label>Monthly share per subscriber <input type="number" id="feeMonthly" min="0" step="1"></label>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="disclaimer">Concept prototype by Sofia Iuteri. Not affiliated with or endorsed by SpaceX or Starlink. Agreement terms are a proposal and earnings are illustrative.</div>
+
+<script src="data/isps.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/tour.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const fmt = n => "$" + Math.round(n).toLocaleString();
+const params = new URLSearchParams(location.search);
+const isp = SLP.allIsps().find(i => SLP.slug(i.name) === params.get("isp")) || (window.ISPS || []).find(i => SLP.slug(i.name) === "piedmont-broadband");
+const id = SLP.slug(isp.name);
+const leaderName = (isp.leader || "").split(",")[0].trim();
+const leaderTitle = (isp.leader || "").split(",").slice(1).join(",").trim();
+
+const st = Object.assign({
+  applied: null, signed: null, slot: null, ship: "", shipped: false, practice: false,
+  customers: [], fee: 175, monthly: 15,
+}, SLP.loadPortal(id) || {});
+const save = () => { SLP.savePortal(id, st); syncStage(); render(); };
+
+// Keep the console pipeline in step with what the partner does here.
+function syncStage() {
+  const stages = SLP.loadStages();
+  const order = SLP.STAGES;
+  const want = st.customers.some(c => c.status === "Active") ? "Live" : st.signed ? "Onboarding" : null;
+  if (want && order.indexOf(want) > order.indexOf(stages[id] || "Researched")) { stages[id] = want; SLP.saveStages(stages); }
+}
+
+const code = (isp.name.replace(/[^A-Za-z ]/g, "").split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join("") + "-VA-" + (100 + (id.length * 37) % 900)).toUpperCase();
+const today = () => new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+
+function slotsList() {
+  const out = [], d = new Date();
+  for (let k = 1; out.length < 4 && k < 14; k++) {
+    const x = new Date(d); x.setDate(d.getDate() + k);
+    if (x.getDay() === 0 || x.getDay() === 6) continue;
+    out.push(x.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }) + (out.length % 2 ? ", 2:00 pm" : ", 10:00 am"));
+  }
+  return out;
+}
+
+function agreementHtml() {
+  const counties = (isp.counties_served || []).join(", ") || isp.county || "its service area";
+  return `<p><b>Parties.</b> ${esc(isp.name)}${isp.hq_town ? ` of ${esc(isp.hq_town)}, Virginia` : ""} ("Partner") and Starlink ("Starlink").</p>
+  <p><b>Territory.</b> ${esc(counties)}.</p>
+  <ol>
+    <li><b>What Partner offers.</b> Starlink service to addresses Partner's own network can't reach, and as a backup line for Partner's business customers. Partner won't move existing customers it can serve on its own network.</li>
+    <li><b>Customer relationship.</b> Partner keeps the customer relationship and handles first-line support. Starlink handles the network, hardware warranty and replacements, and gives Partner a dedicated support line.</li>
+    <li><b>Earnings.</b> Partner sets and keeps its own install fee and earns a monthly share for each active subscriber it brings on, paid monthly.</li>
+    <li><b>Moving customers.</b> If Partner's network later reaches a customer, Partner may move that customer onto its own service.</li>
+    <li><b>No fees or minimums.</b> No sign-up fee, inventory purchase or volume minimum. Not exclusive.</li>
+    <li><b>Term.</b> Starts on signature. Either side can end it with 30 days' written notice.</li>
+  </ol>
+  <p class="muted">Short-form proposal for a concept prototype. Final terms would be set by Starlink.</p>`;
+}
+
+function render() {
+  $("who").textContent = isp.name;
+  $("welcome").textContent = st.signed ? `Welcome to the program, ${isp.name}` : `Welcome, ${isp.name}`;
+  document.title = `Partner Portal · ${isp.name}`;
+  $("agDoc").innerHTML = agreementHtml();
+  $("agCo2").textContent = isp.name;
+  if (!$("sigName").value) $("sigName").value = st.applied?.name || leaderName;
+  if (!$("sigTitle").value) $("sigTitle").value = st.applied?.title || leaderTitle;
+  $("agSign").hidden = !!st.signed; $("agSigned").hidden = !st.signed;
+  if (st.signed) $("agSigned").innerHTML = `Signed by <b>${esc(st.signed.name)}</b>${st.signed.title ? `, ${esc(st.signed.title)}` : ""} on ${esc(st.signed.date)}. <a href="#" id="printAg">Print or save a copy</a>`;
+  $("agStatus").textContent = st.signed ? "Signed" : "Not signed"; $("agStatus").classList.toggle("on", !!st.signed);
+
+  $("slots").innerHTML = slotsList().map(s => `<button class="slot ${st.slot === s ? "on" : ""}">${s}</button>`).join("");
+  $("slots").querySelectorAll(".slot").forEach(b => b.onclick = () => { st.slot = b.textContent; save(); });
+  $("shipTo").value = st.ship; $("practice").checked = st.practice;
+  const trDone = st.slot && st.shipped && st.practice;
+  $("trStatus").textContent = trDone ? "Done" : "To do"; $("trStatus").classList.toggle("on", !!trDone);
+
+  $("pcode").textContent = code;
+  const active = st.customers.filter(c => c.status === "Active");
+  $("ctbody").innerHTML = st.customers.map((c, k) => `<tr><td>${esc(c.who)}</td><td>${esc(c.type)}</td><td>${c.status}</td><td>${c.status === "Quoted" ? `<button class="btn sm" data-k="${k}">Mark installed</button>` : ""}</td></tr>`).join("")
+    || `<tr><td colspan="4" class="muted">No customers yet. Add your first quote above.</td></tr>`;
+  $("ctbody").querySelectorAll("button").forEach(b => b.onclick = () => { st.customers[+b.dataset.k].status = "Active"; save(); });
+  $("custStatus").textContent = `${active.length} active`; $("custStatus").classList.toggle("on", active.length > 0);
+
+  $("feeInstall").value = st.fee; $("feeMonthly").value = st.monthly;
+  const inst = active.length * st.fee, mon = active.length * st.monthly;
+  $("eActive").textContent = active.length; $("eInstall").textContent = fmt(inst); $("eMonthly").textContent = fmt(mon); $("eYear").textContent = fmt(mon * 12);
+
+  const steps = [
+    ["Apply on the partner page", !!st.applied || !!st.signed, "partner.html?isp=" + id + "#apply"],
+    ["Sign the partner agreement", !!st.signed, "#agreement"],
+    ["Book your training", !!st.slot, "#training"],
+    ["Confirm demo kit address", !!st.shipped, "#training"],
+    ["Finish a practice install", !!st.practice, "#training"],
+    ["Activate your first customer", active.length > 0, "#customers"],
+  ];
+  const done = steps.filter(s => s[1]).length;
+  $("checklist").innerHTML = steps.map(s => `<li class="${s[1] ? "done" : ""}"><a href="${s[2]}">${s[0]}</a></li>`).join("");
+  $("pbar").style.width = (done / steps.length * 100) + "%";
+  $("progressText").textContent = done === steps.length ? "You're live. Every customer you add now earns you money each month." : `${done} of ${steps.length} steps done. Next: ${steps.find(s => !s[1])[0].toLowerCase()}.`;
+  if ($("printAg")) $("printAg").onclick = e => { e.preventDefault(); window.print(); };
+}
+
+const updateSign = () => $("signBtn").disabled = !($("sigOk").checked && $("sigName").value.trim().length > 2);
+$("sigOk").onchange = updateSign; $("sigName").oninput = updateSign;
+$("signBtn").onclick = () => { st.signed = { name: $("sigName").value.trim(), title: $("sigTitle").value.trim(), date: today() }; save(); };
+$("shipBtn").onclick = () => { st.ship = $("shipTo").value.trim(); st.shipped = st.ship.length > 5; save(); };
+$("practice").onchange = e => { st.practice = e.target.checked; save(); };
+$("qAdd").onclick = () => { const who = $("qAddr").value.trim(); if (!who) return $("qAddr").focus(); st.customers.push({ who, type: $("qType").value, status: "Quoted" }); $("qAddr").value = ""; save(); };
+$("feeInstall").onchange = e => { st.fee = Math.max(0, +e.target.value || 0); save(); };
+$("feeMonthly").onchange = e => { st.monthly = Math.max(0, +e.target.value || 0); save(); };
+
+SLP.sampleBar($("sampleBar"));
+render();
+</script>
+</body>
+</html>

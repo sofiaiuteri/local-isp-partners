@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Starlink Local Partners · Concept</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="index.html"><span class="wordmark">STARLINK</span><span class="sub caps">Local Partners</span></a>
+  <span class="concept-tag">Concept by Sofia Iuteri · Not affiliated with Starlink</span>
+  <nav class="nav caps">
+    <a href="index.html" class="on">Overview</a>
+    <a href="memo.html">Memo</a>
+    <a href="console.html">Partner Console</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="partner.html?isp=piedmont-broadband">Partner Page</a>
+  </nav>
+</header>
+
+<section class="landing-hero">
+  <div id="heroMap"></div>
+  <div class="inner">
+    <div class="eyebrow caps">A concept for Starlink · Virginia</div>
+    <h1>Every small ISP has a list of homes it can't reach.</h1>
+    <p class="lede">The ridges in Virginia block radio towers, and long rural roads make fiber too expensive. About 2,500 small providers across the US face some version of this. This is a proposal for turning those homes into Starlink customers through the local ISP, starting with 17 providers in Virginia.</p>
+    <div class="ctas" style="display:flex;gap:12px;flex-wrap:wrap"><button class="btn solid" onclick="SLPTour.start()">Take the 2-minute tour</button><a class="btn" href="memo.html">Read the memo</a></div>
+  </div>
+</section>
+
+<div class="stats">
+  <div><div class="n">17</div><div class="l">Small Virginia ISPs researched from public sources</div></div>
+  <div><div class="n">11</div><div class="l">Have an address checker, so they know exactly who they turn away</div></div>
+  <div><div class="n">12</div><div class="l">Are mid-build on state or federal broadband grants</div></div>
+  <div><div class="n">1</div><div class="l">Already installs Starlink on its own, with no program behind it</div></div>
+</div>
+
+<section class="section case">
+  <div class="case-text">
+    <div class="eyebrow caps">Sperryville, Rappahannock County</div>
+    <h2>The one that's already doing it</h2>
+    <p>Piedmont Broadband has served Rappahannock County since 2008 from more than 100 wireless access points. Its website is upfront about the limits. The equipment needs line of sight, and in its words, <span class="quote">"the terrain out here doesn't always cooperate."</span></p>
+    <p>So for homes it can't reach, Piedmont installs Starlink, $250 standard. That works for the customer. But Piedmont is paid once, and every month after that goes straight to Starlink.</p>
+    <p>A partner program would keep Piedmont in that relationship and give it a reason to do the same for every home on its list. There are businesses like this in almost every rural county.</p>
+    <a class="textlink" href="partner.html?isp=piedmont-broadband">See the page Piedmont would get →</a>
+  </div>
+  <div class="case-map"><div id="caseMap"></div><div class="maplabel">Piedmont Broadband · Sperryville, VA</div></div>
+</section>
+
+<section class="section">
+  <h2>What's here</h2>
+  <div class="index">
+    <a href="memo.html"><span class="t">The memo</span><span class="d">Why small ISPs have been hard to sign, the offer I'd make them, and a six-week Virginia pilot. Five-minute read.</span><span class="g">→</span></a>
+    <a href="console.html"><span class="t">Partner Console</span><span class="d">All 17 providers on a terrain map, ranked by fit, with editable outreach. Includes a live agent that researches any ISP you name in about a minute.</span><span class="g">→</span></a>
+    <a href="partner.html?isp=piedmont-broadband"><span class="t">Partner page</span><span class="d">What an ISP owner sees when they click through: their own estimate, honest answers on channel conflict, and a short sign-up.</span><span class="g">→</span></a>
+  </div>
+</section>
+
+<section class="section note-from">
+  <p>I'm Sofia Iuteri, a senior at Washington and Lee in Lexington, a couple of hours down the Blue Ridge from Sperryville. I built this after talking with Starlink's growth team about how hard it is to reach small ISPs one at a time. Everything about the 17 providers comes from public sources, and each fact links back to one. The program terms and dollar figures are my proposal, not Starlink's.</p>
+</section>
+
+<div class="disclaimer">Concept prototype by Sofia Iuteri. Not affiliated with or endorsed by SpaceX or Starlink. Terrain © Esri.</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="data/isps.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/tour.js"></script>
+<script>
+  const isps = window.ISPS || [];
+  const still = { zoomSnap: 1, preferCanvas: true, zoomControl: false, attributionControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false, keyboard: false, touchZoom: false };
+  const terrain = "https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade_Dark/MapServer/tile/{z}/{y}/{x}";
+
+  const map = L.map("heroMap", still).setView([37.55, -82.9], 7);
+  L.tileLayer(terrain, { maxZoom: 16, className: "terrain" }).addTo(map);
+  isps.forEach(i => {
+    if (i.lat == null || i.lng == null) return;
+    L.circle([i.lat, i.lng], { radius: 20000, color: "#fff", weight: .6, opacity: .35, fillOpacity: .04 }).addTo(map);
+    L.circleMarker([i.lat, i.lng], { radius: 3.5, color: "#fff", weight: 1, fillColor: "#fff", fillOpacity: 1 }).addTo(map);
+  });
+
+  const pb = isps.find(i => SLP.slug(i.name) === "piedmont-broadband");
+  if (pb) {
+    const cm = L.map("caseMap", still).setView([pb.lat, pb.lng], 10);
+    L.tileLayer(terrain, { maxZoom: 16, className: "terrain" }).addTo(cm);
+    [5000, 10000].forEach((r, k) => L.circle([pb.lat, pb.lng], { radius: r, color: "#fff", weight: k ? 1 : .6, opacity: k ? .8 : .4, dashArray: k ? "4 6" : null, fillOpacity: k ? 0 : .05 }).addTo(cm));
+    L.circleMarker([pb.lat, pb.lng], { radius: 5, color: "#fff", fillColor: "#fff", fillOpacity: 1, weight: 1 }).addTo(cm);
+  }
+</script>
+</body>
+</html>

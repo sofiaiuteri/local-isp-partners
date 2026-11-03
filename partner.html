@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Become a Starlink Local Partner</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="index.html"><span class="wordmark">STARLINK</span><span class="sub caps">Local Partners</span></a>
+  <span class="concept-tag">Concept by Sofia Iuteri · Not affiliated with Starlink</span>
+  <nav class="nav caps">
+    <a href="#how">How it works</a>
+    <a href="#estimate">Estimate</a>
+    <a href="#questions">Questions</a>
+    <a href="#apply">Apply</a>
+  </nav>
+</header>
+
+<section class="p-hero">
+  <div id="pmap"></div>
+  <div class="inner">
+    <div class="for caps" id="forLine">Local Partner Program · Virginia</div>
+    <h1 id="headline">Serve every address in your area</h1>
+    <p id="subline">Offer Starlink to the homes your network can't reach yet. You keep the customer and earn on every install and every month after.</p>
+    <div class="ctas">
+      <a class="btn solid" href="#apply">Become a partner</a>
+      <a class="btn" href="#estimate">See your estimate</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="how">
+  <h2>How it works</h2>
+  <p class="intro">You already know which homes you can't get to. This program gives you something to offer them besides "not yet."</p>
+  <div class="three">
+    <div><div class="num caps">01</div><h3>Offer</h3><p>When an address is out of range for your towers or fiber, quote Starlink under your name. It also works as a backup line for business customers.</p></div>
+    <div><div class="num caps">02</div><h3>Install</h3><p>Your crew does the install and gets paid for it. We ship kits to you or straight to the customer, whichever you prefer.</p></div>
+    <div><div class="num caps">03</div><h3>Earn</h3><p>You earn a monthly share for every active subscriber you bring on. If you extend your network to them later, you can move them over.</p></div>
+  </div>
+</section>
+
+<section class="section" id="estimate">
+  <h2 id="estTitle">Your estimate</h2>
+  <p class="intro">Move the sliders to match your business. The defaults are conservative starting points.</p>
+  <div class="calc">
+    <div>
+      <div class="slider">
+        <div class="top"><span>Addresses you can't serve today</span><b id="vHomes"></b></div>
+        <input type="range" id="homes" min="10" max="1000" step="10" value="150">
+        <div class="hint">Your waitlist, out-of-range inquiries, and homes past the end of your network.</div>
+      </div>
+      <div class="slider">
+        <div class="top"><span>Share that sign up</span><b id="vRate"></b></div>
+        <input type="range" id="rate" min="5" max="80" step="5" value="35">
+      </div>
+      <div class="slider">
+        <div class="top"><span>Business customers adding a backup line</span><b id="vBiz"></b></div>
+        <input type="range" id="biz" min="0" max="100" step="1" value="10">
+      </div>
+      <div class="slider">
+        <div class="top"><span>Your monthly share per subscriber</span><b id="vMargin"></b></div>
+        <input type="range" id="margin" min="5" max="40" step="1" value="15">
+      </div>
+      <div class="slider" style="margin-bottom:0">
+        <div class="top"><span>Install fee you charge</span><b id="vInstall"></b></div>
+        <input type="range" id="install" min="0" max="400" step="25" value="175">
+      </div>
+    </div>
+    <div class="out">
+      <div class="k caps">First-year revenue</div>
+      <div class="big" id="oYear1"></div>
+      <div class="k" id="oSubs"></div>
+      <div class="line"><span>Install revenue</span><b id="oInstall"></b></div>
+      <div class="line"><span>Monthly share, year one</span><b id="oMonthly"></b></div>
+      <div class="line"><span>Recurring every year after</span><b id="oRecurring"></b></div>
+      <div class="line"><span>Towers or fiber you'd need to build</span><b>None</b></div>
+      <p class="note">Illustrative only. Real partner terms would be set by Starlink. The year-one figure assumes every customer is active for the full year.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="questions">
+  <h2>Straight answers</h2>
+  <p class="intro">These are the questions local providers ask first. The answers describe the program as proposed, and Starlink would set the final terms.</p>
+  <div class="faq">
+    <details open><summary>Isn't Starlink my competitor?</summary><p>For the homes you already serve, nothing changes. This program only covers addresses you can't reach and backup lines for your business customers. Those people are going to look at Starlink either way. As a partner, they come through you, stay your customers, and you get paid.</p></details>
+    <details><summary>What does it cost to join?</summary><p>The proposal is no fee, no inventory to buy up front, and no volume minimum, so a provider could sign up one customer a year or a hundred. That's the main change from a traditional reseller program, which is built for much larger partners.</p></details>
+    <details><summary>Who handles installs and support?</summary><p>Your crew handles installs and first-line support, the same way you do today. Starlink handles the network, hardware warranty, and replacements. The proposal includes a dedicated partner support line, so you don't wait in the consumer queue.</p></details>
+    <details><summary>Can I still build out to these homes later?</summary><p>Yes. If your network reaches them later, you can move them onto your own service. Nothing locks them into Starlink.</p></details>
+    <details><summary>How does this fit with my BEAD or VATI build?</summary><p>Use it for the addresses outside your funded build area, or to get people online while construction is underway. Check your grant terms for anything inside a funded project area.</p></details>
+    <details><summary>How long does sign-up take?</summary><p>The goal is about 15 minutes online, then a short training session and a demo kit for your crew to practice on.</p></details>
+  </div>
+</section>
+
+<section class="section" id="apply">
+  <h2>Become a partner</h2>
+  <p class="intro" id="applyIntro">Three short steps. We already filled in what we could. (Prototype: nothing is submitted.)</p>
+  <div class="apply">
+    <ol class="progress" id="progress">
+      <li class="on">Your company</li>
+      <li>Your territory</li>
+      <li>Agreement</li>
+    </ol>
+    <form id="form" onsubmit="return false">
+      <div class="form-step on" data-step="0">
+        <div class="field"><label>Company name</label><input id="fCompany" required></div>
+        <div class="grid2">
+          <div class="field"><label>Your name</label><input id="fName" required></div>
+          <div class="field"><label>Title</label><input id="fTitle" placeholder="Owner, GM, ..."></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>Email</label><input id="fEmail" type="email" required></div>
+          <div class="field"><label>Phone</label><input id="fPhone" type="tel"></div>
+        </div>
+        <div class="field"><label>Network type</label>
+          <select id="fType"><option>Fixed wireless</option><option>Fiber</option><option>DSL / copper</option><option>Cable</option><option>Mixed</option></select></div>
+        <div class="form-nav"><button class="btn solid" data-next>Continue</button></div>
+      </div>
+
+      <div class="form-step" data-step="1">
+        <div class="field"><label>Counties you serve</label><input id="fCounties" required></div>
+        <div class="grid2">
+          <div class="field"><label>Current subscribers</label><input id="fSubs" type="number" min="0" placeholder="Approximate is fine"></div>
+          <div class="field"><label>Addresses on your waitlist</label><input id="fWait" type="number" min="0"></div>
+        </div>
+        <label class="caps" style="font-size:12px;color:var(--muted);letter-spacing:.1em">What you'd offer</label>
+        <div class="checks">
+          <label><input type="checkbox" checked> Residential service for homes outside my network</label>
+          <label><input type="checkbox" checked> Backup lines for business customers</label>
+          <label><input type="checkbox"> Starlink Mini for seasonal, RV, farm, and marine customers</label>
+          <label><input type="checkbox" checked> Installation and on-site support</label>
+        </div>
+        <div class="form-nav"><button class="btn" data-back>Back</button><button class="btn solid" data-next>Continue</button></div>
+      </div>
+
+      <div class="form-step" data-step="2">
+        <div class="terms">
+          <b style="color:#fff">Proposed partner agreement, short version</b>
+          <ul>
+            <li>You offer Starlink to addresses outside your network and to business customers as a backup line.</li>
+            <li>You earn an install fee you set and a monthly share for each active subscriber.</li>
+            <li>No fees, minimums, or exclusivity. Either side can end it with 30 days' notice.</li>
+            <li>You keep the customer relationship and handle first-line support.</li>
+          </ul>
+        </div>
+        <div class="checks">
+          <label><input type="checkbox" id="fAgree"> I've read the agreement and I'm authorized to sign for my company.</label>
+        </div>
+        <div class="form-nav"><button class="btn" data-back>Back</button><button class="btn solid" id="submit" disabled>Sign and submit</button></div>
+      </div>
+
+      <div class="form-step done-box" data-step="3">
+        <h3>You're in</h3>
+        <p style="color:#cfcfd4" id="doneLine">Here's what happens next.</p>
+        <ol>
+          <li>Your signed agreement is saved in your partner portal.</li>
+          <li>Book a 30-minute training on quoting, installs and support handoffs.</li>
+          <li>Confirm where to ship your demo kit, so your crew can do a practice install.</li>
+          <li>From then on, quote Starlink for any out-of-range address and track your earnings in the portal.</li>
+        </ol>
+        <div class="form-nav" style="margin-top:22px"><a class="btn solid" id="toPortal" href="portal.html">Open your partner portal</a></div>
+        <p class="note" style="color:var(--dim);font-size:12.5px;margin-top:22px">Prototype: nothing was sent to Starlink.</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<div class="disclaimer">Concept prototype by Sofia Iuteri, Washington and Lee University. Not affiliated with or endorsed by SpaceX or Starlink. Program terms shown are proposals, and earnings figures are illustrative.</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="data/isps.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/tour.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+const isp = SLP.allIsps().find(i => SLP.slug(i.name) === params.get("isp"));
+
+// personalize
+let center = [37.75, -79.2], zoom = 7;
+if (isp) {
+  const area = SLP.areaPhrase(isp);
+  const firstCounty = (isp.counties_served && isp.counties_served[0]) || isp.county || isp.hq_town;
+  document.title = "Starlink Local Partners · " + isp.name;
+  $("forLine").textContent = "Prepared for " + isp.name;
+  $("headline").textContent = "Serve every address in " + firstCounty;
+  $("subline").textContent = "Your network already covers a lot of " + area + ". For the homes it can't reach yet, offer Starlink under your name, keep the customer, and earn on every install and every month after.";
+  $("estTitle").textContent = "Your estimate, " + isp.name;
+  $("fCompany").value = isp.name;
+  if (isp.leader) {
+    const [nm, ...t] = String(isp.leader).split(",");
+    $("fName").value = nm.trim();
+    if (t.length) $("fTitle").value = t.join(",").trim();
+  }
+  $("fCounties").value = (isp.counties_served || [isp.county]).filter(Boolean).join(", ");
+  if (isp.est_customers) $("fSubs").value = isp.est_customers;
+  const typeMap = { "Fixed wireless": "Fixed wireless", "Co-op fiber": "Fiber", "Local fiber": "Fiber", "Rural telco": "Mixed", "Hybrid": "Mixed" };
+  $("fType").value = typeMap[isp.type] || "Mixed";
+  if (isp.lat != null) { center = [isp.lat, isp.lng]; zoom = 10; }
+}
+
+const map = L.map("pmap", { zoomSnap: 1, preferCanvas: true, zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false, keyboard: false, touchZoom: false })
+  .setView([center[0], center[1] - (isp ? 0.55 : 1.2)], zoom);
+L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade_Dark/MapServer/tile/{z}/{y}/{x}", { attribution: "Terrain &copy; Esri", maxZoom: 16, className: "terrain" }).addTo(map);
+if (isp && isp.lat != null) {
+  [8000, 16000, 26000].forEach((r, k) => L.circle(center, { radius: r, color: "#fff", weight: k === 2 ? 1 : .6, opacity: k === 2 ? .7 : .3, dashArray: k === 2 ? "4 6" : null, fillOpacity: k === 0 ? .06 : 0 }).addTo(map));
+  L.circleMarker(center, { radius: 5, color: "#fff", fillColor: "#fff", fillOpacity: 1, weight: 1 }).addTo(map);
+}
+
+// calculator
+const fmt = n => "$" + Math.round(n).toLocaleString();
+function calc() {
+  const homes = +$("homes").value, rate = +$("rate").value, biz = +$("biz").value, margin = +$("margin").value, install = +$("install").value;
+  $("vHomes").textContent = homes; $("vRate").textContent = rate + "%"; $("vBiz").textContent = biz;
+  $("vMargin").textContent = "$" + margin; $("vInstall").textContent = "$" + install;
+  const subs = Math.round(homes * rate / 100) + biz;
+  const inst = subs * install, monthly = subs * margin * 12;
+  $("oYear1").textContent = fmt(inst + monthly);
+  $("oSubs").textContent = subs + " new subscribers";
+  $("oInstall").textContent = fmt(inst);
+  $("oMonthly").textContent = fmt(monthly);
+  $("oRecurring").textContent = fmt(monthly);
+}
+["homes", "rate", "biz", "margin", "install"].forEach(id => $(id).addEventListener("input", calc));
+calc();
+
+// multi-step form
+let step = 0;
+const steps = [...document.querySelectorAll(".form-step")];
+const prog = [...document.querySelectorAll("#progress li")];
+function go(n) {
+  step = n;
+  steps.forEach((s, k) => s.classList.toggle("on", k === n));
+  prog.forEach((p, k) => { p.classList.toggle("on", k === n); p.classList.toggle("done", k < n); });
+}
+document.querySelectorAll("[data-next]").forEach(b => b.onclick = () => {
+  const bad = [...steps[step].querySelectorAll("input[required]")].find(i => !i.reportValidity());
+  if (!bad) go(step + 1);
+});
+document.querySelectorAll("[data-back]").forEach(b => b.onclick = () => go(step - 1));
+$("fAgree").onchange = e => $("submit").disabled = !e.target.checked;
+$("submit").onclick = () => {
+  $("doneLine").textContent = ($("fName").value ? "Thanks, " + $("fName").value.split(" ")[0] + ". " : "") + $("fCompany").value + " is now a Starlink Local Partner. Here's what happens next.";
+  prog.forEach(p => { p.classList.remove("on"); p.classList.add("done"); });
+  const pid = SLP.slug($("fCompany").value || (isp && isp.name) || "partner");
+  const date = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  const prev = SLP.loadPortal(pid) || {};
+  SLP.savePortal(pid, { ...prev,
+    applied: { name: $("fName").value, title: $("fTitle").value, email: $("fEmail").value, phone: $("fPhone").value, counties: $("fCounties").value, subs: $("fSubs").value, waitlist: $("fWait").value },
+    signed: prev.signed || { name: $("fName").value, title: $("fTitle").value, date } });
+  const stages = SLP.loadStages();
+  if (SLP.STAGES.indexOf(stages[pid] || "Researched") < SLP.STAGES.indexOf("Onboarding")) { stages[pid] = "Onboarding"; SLP.saveStages(stages); }
+  $("toPortal").href = "portal.html?isp=" + pid;
+  go(3);
+};
+</script>
+</body>
+</html>

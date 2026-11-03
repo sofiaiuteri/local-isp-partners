@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Dashboard · Starlink Local Partners</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="index.html"><span class="wordmark">STARLINK</span><span class="sub caps">Local Partners</span></a>
+  <span class="concept-tag">Concept by Sofia Iuteri · Not affiliated with Starlink</span>
+  <nav class="nav caps">
+    <a href="index.html">Overview</a>
+    <a href="memo.html">Memo</a>
+    <a href="console.html">Partner Console</a>
+    <a href="dashboard.html" class="on">Dashboard</a>
+    <a href="partner.html?isp=piedmont-broadband">Partner Page</a>
+  </nav>
+</header>
+
+<section class="section dash">
+  <div class="eyebrow caps">Virginia pilot · live from the console</div>
+  <h2>Where the pipeline stands</h2>
+  <p class="intro">Every ISP in the console and where it sits, from researched to live partner. It updates as you approve outreach, log replies and partners sign up in their portal.</p>
+  <div class="samplebar" id="sampleBar"></div>
+  <div class="tiles" id="liveTiles"></div>
+  <div class="funnel" id="liveFunnel" aria-label="Virginia pipeline by stage"></div>
+  <div class="replies" id="replyMix"></div>
+</section>
+
+<section class="section dash">
+  <div class="eyebrow caps">Rollout model</div>
+  <h2>What a national rollout could deliver</h2>
+  <p class="intro">Starts from the ~2,500 small US ISPs and the ~1.5 to 2 million customers they serve. Every rate below is an assumption you can change. The Virginia pilot's job is to replace these guesses with real numbers.</p>
+  <div class="model">
+    <div class="sliders" id="sliders"></div>
+    <div>
+      <div class="tiles" id="modelTiles"></div>
+      <div class="funnel" id="modelFunnel" aria-label="Projected national funnel"></div>
+      <p class="note-sm">Projection, not a forecast. Rates are placeholders until the pilot measures them.</p>
+    </div>
+  </div>
+</section>
+
+<div class="tip" id="tip" role="tooltip"></div>
+<div class="disclaimer">Concept prototype by Sofia Iuteri. Not affiliated with or endorsed by SpaceX or Starlink. All projections are illustrative.</div>
+
+<script src="data/isps.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/tour.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const num = n => Math.round(n).toLocaleString();
+const money = n => n >= 1e6 ? "$" + (n / 1e6).toFixed(1) + "M" : "$" + num(n);
+
+function tiles(el, items) {
+  el.innerHTML = items.map(t => `<div class="tile"><div class="n">${t[0]}</div><div class="l">${t[1]}</div></div>`).join("");
+}
+
+// Horizontal funnel: one series, bars anchored left, value + share of previous step labeled on each row.
+function funnel(el, rows) {
+  const max = Math.max(1, ...rows.map(r => r.v));
+  el.innerHTML = rows.map((r, k) => {
+    const prev = k ? rows[k - 1].v : null;
+    const pct = prev ? (prev ? Math.round(r.v / prev * 100) : 0) + "% of previous" : "";
+    return `<div class="frow" data-tip="${esc(r.label)}: ${num(r.v)}${pct ? " (" + pct + ")" : ""}">
+      <div class="flabel">${esc(r.label)}</div>
+      <div class="ftrack"><div class="fbar" style="width:${Math.max(r.v / max * 100, r.v ? 0.6 : 0)}%"></div></div>
+      <div class="fval">${num(r.v)}<span>${pct}</span></div></div>`;
+  }).join("");
+}
+
+// ---- Live pipeline from the console's saved state ----
+const isps = SLP.allIsps();
+const stages = SLP.loadStages();
+const order = SLP.STAGES;
+const reached = s => isps.filter(i => order.indexOf(SLP.stageOf(i, stages)) >= order.indexOf(s)).length;
+const portals = SLP.allPortals();
+const activeSubs = Object.values(portals).reduce((a, p) => a + (p.customers || []).filter(c => c.status === "Active").length, 0);
+const signed = Object.values(portals).filter(p => p.signed).length;
+tiles($("liveTiles"), [
+  [isps.length, "ISPs researched"],
+  [reached("Contacted"), "Contacted"],
+  [signed, "Agreements signed"],
+  [activeSubs, "Active subscribers via partners"],
+]);
+funnel($("liveFunnel"), order.map(s => ({ label: s, v: reached(s) })));
+
+const replies = Object.values(SLP.loadReplies());
+if (replies.length) {
+  const counts = {};
+  replies.forEach(r => { const c = r.out?.category || "Other"; counts[c] = (counts[c] || 0) + 1; });
+  const concerns = replies.flatMap(r => r.out?.concerns || []);
+  $("replyMix").innerHTML = `<h4 class="caps">Replies sorted by the agent</h4>
+    <table class="rtable"><thead><tr><th>Category</th><th>Replies</th></tr></thead><tbody>
+    ${Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([c, n]) => `<tr><td>${esc(c)}</td><td>${n}</td></tr>`).join("")}</tbody></table>
+    ${concerns.length ? `<h4 class="caps" style="margin-top:22px">Concerns raised</h4><ul class="signals">${concerns.slice(0, 8).map(c => `<li>${esc(c)}</li>`).join("")}</ul>` : ""}`;
+} else {
+  $("replyMix").innerHTML = `<p class="note-sm">No replies logged yet. Paste one into an ISP's profile in the console and the reply agent sorts it here.</p>`;
+}
+
+SLP.sampleBar(document.getElementById("sampleBar"));
+
+// ---- Rollout model ----
+const S = [
+  { k: "isps", label: "Small ISPs reached", min: 100, max: 2500, step: 50, v: 2500, f: v => num(v) },
+  { k: "reply", label: "Reply rate", min: 2, max: 50, step: 1, v: 15, f: v => v + "%" },
+  { k: "call", label: "Replies that take a call", min: 10, max: 100, step: 5, v: 50, f: v => v + "%" },
+  { k: "sign", label: "Calls that sign", min: 5, max: 100, step: 5, v: 40, f: v => v + "%" },
+  { k: "act", label: "Signed partners who activate a customer", min: 10, max: 100, step: 5, v: 70, f: v => v + "%" },
+  { k: "subs", label: "Subscribers per active partner, year 1", min: 5, max: 300, step: 5, v: 40, f: v => num(v) },
+  { k: "arpu", label: "Monthly revenue per subscriber to Starlink", min: 20, max: 200, step: 5, v: 100, f: v => "$" + v },
+];
+$("sliders").innerHTML = S.map(s => `<div class="slider"><div class="top"><span>${s.label}</span><b id="v_${s.k}"></b></div>
+  <input type="range" id="s_${s.k}" min="${s.min}" max="${s.max}" step="${s.step}" value="${s.v}"></div>`).join("");
+function model() {
+  const v = Object.fromEntries(S.map(s => [s.k, +$("s_" + s.k).value]));
+  S.forEach(s => $("v_" + s.k).textContent = s.f(v[s.k]));
+  const replied = v.isps * v.reply / 100, calls = replied * v.call / 100, signedP = calls * v.sign / 100, active = signedP * v.act / 100;
+  const subs = active * v.subs, rev = subs * v.arpu * 12;
+  tiles($("modelTiles"), [[num(active), "Active partners"], [num(subs), "New subscribers, year 1"], [money(rev), "Annual revenue run-rate"], [num(v.isps), "ISPs to research"]]);
+  funnel($("modelFunnel"), [
+    { label: "Reached", v: v.isps }, { label: "Replied", v: replied }, { label: "Call", v: calls },
+    { label: "Signed", v: signedP }, { label: "Active partner", v: active },
+  ]);
+}
+S.forEach(s => $("s_" + s.k).addEventListener("input", model));
+model();
+
+// Hover tooltip for every funnel row (the whole row is the hit target).
+const tip = $("tip");
+document.addEventListener("mousemove", e => {
+  const row = e.target.closest?.(".frow");
+  if (!row) { tip.classList.remove("show"); return; }
+  tip.textContent = row.dataset.tip; tip.classList.add("show");
+  tip.style.left = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 10) + "px"; tip.style.top = (e.clientY + 14) + "px";
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Partner Console · Starlink Local Partners</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="console">
+
+<header class="topbar">
+  <a class="brand" href="index.html"><span class="wordmark">STARLINK</span><span class="sub caps">Local Partners</span></a>
+  <span class="concept-tag">Concept by Sofia Iuteri · Not affiliated with Starlink</span>
+  <nav class="nav caps">
+    <a href="index.html">Overview</a>
+    <a href="memo.html">Memo</a>
+    <a href="console.html" class="on">Partner Console</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="partner.html" id="navPartner">Partner Page</a>
+  </nav>
+</header>
+
+<div class="kpis">
+  <div class="kpi"><div class="n" id="kTotal">0</div><div class="l">Target ISPs · VA</div></div>
+  <div class="kpi"><div class="n" id="kHigh">0</div><div class="l">Strong fit (75+)</div></div>
+  <div class="kpi"><div class="n" id="kContacted">0</div><div class="l">Contacted</div></div>
+  <div class="kpi"><div class="n" id="kCalls">0</div><div class="l">Calls booked</div></div>
+  <div class="kpi"><div class="n" id="kLive">0</div><div class="l">Live partners</div></div>
+  <div class="spacer"></div>
+  <div class="viewtoggle">
+    <div class="seg"><button id="vMap" class="on">Map</button><button id="vBoard">Pipeline</button></div>
+  </div>
+</div>
+
+<div class="samplebar slim" id="sampleBar"></div>
+<div class="workspace">
+  <aside class="list">
+    <div class="filters">
+      <div class="row">
+        <button class="btn sm solid" id="openDiscover">Discover ISPs</button>
+        <button class="btn sm" id="openResearch">Research one</button>
+      </div>
+      <input id="q" placeholder="Search ISPs, towns, counties">
+      <div class="row">
+        <select id="fType"><option value="">All types</option></select>
+        <select id="fRegion"><option value="">All regions</option></select>
+      </div>
+      <div class="row">
+        <select id="fStage"><option value="">All stages</option></select>
+        <select id="fSort"><option value="score">Sort: fit score</option><option value="name">Sort: name</option></select>
+      </div>
+    </div>
+    <div class="rows" id="rows"></div>
+  </aside>
+
+  <main class="center">
+    <div id="map"></div>
+    <div class="board" id="board"></div>
+  </main>
+
+  <aside class="detail" id="detail"><div class="empty">Select an ISP on the map or in the list to see its profile, fit score, and drafted outreach.</div></aside>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="k caps">Live research agent</div>
+    <h3>Research any ISP</h3>
+    <p>Type a company name or website. The agent searches the web, reads the company's own site, grant records and local news, then builds a profile, fit score and outreach draft. It takes about a minute.</p>
+    <div class="field"><label>ISP name or website</label><input id="rq" placeholder="e.g. BVU OptiNet, or a company website"></div>
+    <div class="field"><label>Access code</label><input id="rcode" type="password" placeholder="Shared with you by Sofia"></div>
+    <div class="status" id="rstatus"></div>
+    <div class="form-nav"><button class="btn" id="rcancel">Close</button><button class="btn solid" id="rgo">Research</button></div>
+  </div>
+</div>
+
+<div class="modal" id="dmodal">
+  <div class="modal-box wide">
+    <div class="k caps">Discovery agent</div>
+    <h3>Find the small ISPs in an area</h3>
+    <p>Name a county, region or state. The agent searches state grant records, county broadband pages, trade groups and company sites for the small providers that serve it, and skips the big carriers. Then pick which ones to research in full. Finding them takes 1 to 2 minutes, and each full profile about a minute.</p>
+    <div class="grid2">
+      <div class="field"><label>County, region or state</label><input id="da" placeholder="e.g. Rockbridge County, Virginia"></div>
+      <div class="field"><label>Access code</label><input id="dcode" type="password" placeholder="Shared with you by Sofia"></div>
+    </div>
+    <div class="status" id="dstatus"></div>
+    <div class="dlist" id="dlist"></div>
+    <div class="form-nav"><button class="btn" id="dcancel">Close</button><button class="btn" id="dgo">Find ISPs</button><button class="btn solid" id="dresearch" disabled>Research selected</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="data/isps.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/tour.js"></script>
+<script>
+const prep = i => ({ ...i, _id: SLP.slug(i.name), _score: SLP.score(i) });
+const ISPS = SLP.allIsps().map(prep);
+let stages = SLP.loadStages();
+let selected = null;
+const drafts = {}; // edited drafts per ISP, kept for the session
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// filters
+[...new Set(ISPS.map(i => i.type))].sort().forEach(t => $("fType").insertAdjacentHTML("beforeend", `<option>${esc(t)}</option>`));
+[...new Set(ISPS.map(i => i.region))].sort().forEach(t => $("fRegion").insertAdjacentHTML("beforeend", `<option>${esc(t)}</option>`));
+SLP.STAGES.forEach(s => $("fStage").insertAdjacentHTML("beforeend", `<option>${s}</option>`));
+["q", "fType", "fRegion", "fStage", "fSort"].forEach(id => $(id).addEventListener("input", render));
+
+// map
+const map = L.map("map", { zoomControl: true, preferCanvas: true }).setView([37.7, -79.1], 7);
+L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade_Dark/MapServer/tile/{z}/{y}/{x}", { attribution: "Terrain &copy; Esri", maxZoom: 16, className: "terrain" }).addTo(map);
+L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}", { maxZoom: 16, opacity: .7 }).addTo(map);
+const markers = {};
+function markerStyle(i, on) {
+  const s = i._score.total;
+  return { radius: on ? 10 : 4 + s / 14, color: "#fff", weight: on ? 2 : 1, opacity: on ? 1 : .8, fillColor: "#fff", fillOpacity: s >= 75 ? .9 : s >= 60 ? .5 : .15 };
+}
+function addMarker(i) {
+  if (i.lat == null || i.lng == null) return;
+  const m = L.circleMarker([i.lat, i.lng], markerStyle(i, false)).addTo(map);
+  m.bindTooltip(`${esc(i.name)} · ${i._score.total}`, { className: "isp-tip", direction: "top", offset: [0, -6] });
+  m.on("click", () => select(i._id));
+  markers[i._id] = m;
+}
+ISPS.forEach(addMarker);
+
+function visible() {
+  const q = $("q").value.trim().toLowerCase();
+  let list = ISPS.filter(i =>
+    (!$("fType").value || i.type === $("fType").value) &&
+    (!$("fRegion").value || i.region === $("fRegion").value) &&
+    (!$("fStage").value || SLP.stageOf(i, stages) === $("fStage").value) &&
+    (!q || [i.name, i.hq_town, i.county, ...(i.counties_served || [])].join(" ").toLowerCase().includes(q)));
+  list.sort($("fSort").value === "name" ? (a, b) => a.name.localeCompare(b.name) : (a, b) => b._score.total - a._score.total);
+  return list;
+}
+
+function render() {
+  const list = visible();
+  $("rows").innerHTML = list.map(i => {
+    const st = SLP.stageOf(i, stages);
+    return `<div class="isp-row ${selected === i._id ? "on" : ""}" data-id="${i._id}">
+      <div class="nm">${esc(i.name)}</div>
+      <div class="sc"><div class="score">${i._score.total}</div></div>
+      <div class="meta">${i.live ? "Live · " : ""}${esc(i.type)} · ${esc(i.hq_town)}${st !== "Researched" ? `<span class="stage-pill ${st === "Live" ? "live" : ""}">${st}</span>` : ""}</div>
+    </div>`;
+  }).join("") || `<div class="empty" style="padding:24px;color:var(--muted)">No ISPs match those filters.</div>`;
+  $("rows").querySelectorAll(".isp-row").forEach(r => r.onclick = () => select(r.dataset.id));
+
+  const ids = new Set(list.map(i => i._id));
+  ISPS.forEach(i => { const m = markers[i._id]; if (!m) return; ids.has(i._id) ? m.addTo(map) : m.remove(); });
+
+  // board
+  $("board").innerHTML = SLP.STAGES.map(s => {
+    const items = list.filter(i => SLP.stageOf(i, stages) === s);
+    return `<div class="col"><h5><span>${s}</span><span>${items.length}</span></h5><div class="cards">${
+      items.map(i => `<div class="card" data-id="${i._id}"><div class="nm">${esc(i.name)}</div><div class="meta">${esc(i.hq_town)} · fit ${i._score.total}</div></div>`).join("")
+    }</div></div>`;
+  }).join("");
+  $("board").querySelectorAll(".card").forEach(c => c.onclick = () => select(c.dataset.id));
+
+  // kpis
+  const count = s => ISPS.filter(i => SLP.STAGES.indexOf(SLP.stageOf(i, stages)) >= SLP.STAGES.indexOf(s)).length;
+  $("kTotal").textContent = ISPS.length;
+  $("kHigh").textContent = ISPS.filter(i => i._score.total >= 75).length;
+  $("kContacted").textContent = count("Contacted");
+  $("kCalls").textContent = count("Call booked");
+  $("kLive").textContent = count("Live");
+}
+
+function select(id) {
+  selected = id;
+  const i = ISPS.find(x => x._id === id);
+  if (!i) return;
+  Object.entries(markers).forEach(([k, m]) => m.setStyle(markerStyle(ISPS.find(x => x._id === k), k === id)));
+  if (i.lat != null && !$("board").classList.contains("show")) map.flyTo([i.lat, i.lng], Math.max(map.getZoom(), 8), { duration: .6 });
+  const st = SLP.stageOf(i, stages);
+  const si = SLP.STAGES.indexOf(st);
+  const d = drafts[id] || SLP.draft(i);
+  const next = SLP.STAGES[si + 1];
+  const host = (i.website || "").replace(/^https?:\/\//, "").replace(/\/$/, "");
+  $("detail").classList.add("open");
+  $("detail").innerHTML = `
+    <div class="d-head">
+      <div class="k caps">${i.live ? "Researched live · " : ""}${esc(i.type)} · ${esc(i.region)}</div>
+      <h2>${esc(i.name)}</h2>
+      <div class="site">${i.website ? `<a href="${esc(i.website)}" target="_blank" rel="noopener">${esc(host)}</a> · ` : ""}${esc(i.hq_town)}, VA</div>
+    </div>
+    <div class="d-sec">
+      <h4><span>Pipeline</span><span>${st}</span></h4>
+      <div class="stagebar">${SLP.STAGES.map((s, k) => `<span class="${k <= si ? "done" : ""}"></span>`).join("")}</div>
+      <div class="actions">
+        ${si === 0 ? `<button class="btn sm solid" id="approve">Approve &amp; send</button>` : next ? `<button class="btn sm solid" id="advance">Move to ${next}</button>` : ""}
+        <a class="btn sm" href="${SLP.partnerUrl(i)}" target="_blank">Their partner page</a>
+        ${si > 0 ? `<button class="btn sm" id="reset">Reset</button>` : ""}
+      </div>
+    </div>
+    <div class="d-sec">
+      <h4><span>Fit score</span><span class="score" style="font-size:22px;color:#fff">${i._score.total}</span></h4>
+      <ul class="why">${i._score.why.map(w => `<li><span class="pts">+${w[0]}</span><span>${esc(w[1])}</span></li>`).join("")}</ul>
+    </div>
+    <div class="d-sec">
+      <h4><span>Profile</span></h4>
+      <div class="facts">
+        <div><div class="l">Leader</div>${esc(i.leader || "Not listed publicly")}</div>
+        <div><div class="l">Customers</div>${i.est_customers != null ? "~" + Number(i.est_customers).toLocaleString() : "Not published"}</div>
+        <div style="grid-column:1/3"><div class="l">Counties served</div>${esc((i.counties_served || []).join(", ") || i.county || "Unknown")}</div>
+      </div>
+    </div>
+    <div class="d-sec">
+      <h4><span>What the research found</span></h4>
+      <ul class="signals">${(i.signals || []).map(s => `<li>${esc(s)}</li>`).join("") || "<li>No signals recorded</li>"}</ul>
+    </div>
+    <div class="d-sec">
+      <h4><span>Drafted outreach</span><span style="text-transform:none;letter-spacing:0">Click to edit</span></h4>
+      <div class="draft-sub">Subject: <span contenteditable="true" id="subj">${esc(d.subject)}</span></div>
+      <div class="draft" contenteditable="true" id="body">${esc(d.body)}</div>
+    </div>
+    <div class="d-sec">
+      <h4><span>Their reply</span><span style="text-transform:none;letter-spacing:0">Reply agent</span></h4>
+      <textarea class="replybox" id="rtext" placeholder="Paste what the ISP owner wrote back. The agent sorts it, flags their concerns and drafts an answer.">${esc(replies[id]?.reply || "")}</textarea>
+      <div class="actions" style="margin-top:10px"><button class="btn sm solid" id="ranalyze">Analyze reply</button><span class="status" id="rstat2"></span></div>
+      <div id="rout">${replies[id]?.out ? replyHtml(replies[id].out) : ""}</div>
+    </div>
+    <div class="d-sec">
+      <h4><span>Sources</span></h4>
+      <div class="srcs">${(i.sources || []).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a>`).join("")}</div>
+    </div>`;
+  const keep = () => drafts[id] = { subject: $("subj").innerText, body: $("body").innerText };
+  $("subj").oninput = keep; $("body").oninput = keep;
+  const setStage = s => { stages[id] = s; SLP.saveStages(stages); render(); select(id); };
+  if ($("approve")) $("approve").onclick = () => { setStage("Contacted"); toast(`Queued for ${i.name}. In the live version this sends from a real inbox.`); };
+  if ($("advance")) $("advance").onclick = () => { setStage(next); toast(`${i.name} moved to ${next}`); };
+  if ($("reset")) $("reset").onclick = () => { delete stages[id]; SLP.saveStages(stages); render(); select(id); };
+  const wireReply = () => { const b = $("rmove"); if (b) b.onclick = () => { setStage(b.dataset.stage); toast(`${i.name} moved to ${b.dataset.stage}`); }; };
+  wireReply();
+  $("ranalyze").onclick = async () => {
+    const reply = $("rtext").value.trim();
+    if (!reply) { $("rtext").focus(); return; }
+    const code = getCode(); if (!code) return;
+    $("ranalyze").disabled = true; $("rstat2").textContent = "Reading their reply…";
+    try {
+      const out = await post("api/reply", { code, reply, isp: i, sent: $("body").innerText });
+      replies[id] = { reply, out, at: new Date().toISOString() }; SLP.saveReplies(replies);
+      if (SLP.STAGES.indexOf(SLP.stageOf(i, stages)) < 2) { stages[id] = "Replied"; SLP.saveStages(stages); }
+      $("rout").innerHTML = replyHtml(out); $("rstat2").textContent = ""; wireReply(); render();
+    } catch (e) { $("rstat2").textContent = e.message; }
+    finally { $("ranalyze").disabled = false; }
+  };
+  render();
+}
+
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2600); }
+
+$("vMap").onclick = () => { $("vMap").classList.add("on"); $("vBoard").classList.remove("on"); $("board").classList.remove("show"); setTimeout(() => map.invalidateSize(), 50); };
+$("vBoard").onclick = () => { $("vBoard").classList.add("on"); $("vMap").classList.remove("on"); $("board").classList.add("show"); };
+
+// shared helpers for the agents
+let replies = SLP.loadReplies();
+function getCode() {
+  let c = sessionStorage.getItem("slp-code");
+  if (!c) { c = (prompt("Access code for the live agents:") || "").trim(); if (c) sessionStorage.setItem("slp-code", c); }
+  return c;
+}
+async function post(url, body) {
+  let res;
+  try { res = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }); }
+  catch { throw new Error("The live agents only work on the hosted version of this site."); }
+  const data = await res.json().catch(() => ({ error: "The service didn't respond." }));
+  if (res.status === 401) sessionStorage.removeItem("slp-code");
+  if (!res.ok) throw new Error(data.error || "Something went wrong.");
+  return data;
+}
+function replyHtml(o) {
+  const next = o.suggested_stage;
+  return `<div class="rcard">
+    <div class="rtop"><span class="rcat">${esc(o.category)}</span><span>${esc(o.summary)}</span></div>
+    ${o.concerns?.length ? `<div class="l">Concerns</div><ul class="signals">${o.concerns.map(c => `<li>${esc(c)}</li>`).join("")}</ul>` : ""}
+    <div class="l">Recommended next step</div><p>${esc(o.next_step)}</p>
+    ${o.reply_body ? `<div class="l">Drafted answer · click to edit</div><div class="draft-sub">Subject: ${esc(o.reply_subject)}</div><div class="draft" contenteditable="true">${esc(o.reply_body)}</div>` : ""}
+    ${next ? `<div class="actions" style="margin-top:12px"><button class="btn sm" id="rmove" data-stage="${esc(next)}">Move to ${esc(next)}</button></div>` : ""}
+  </div>`;
+}
+async function researchOne(query, code) {
+  const data = await post("api/research", { query, code });
+  SLP.addLive(data.isp);
+  const isp = prep({ ...data.isp, live: true });
+  const k = ISPS.findIndex(x => x._id === isp._id);
+  if (k >= 0) { markers[isp._id]?.remove(); ISPS[k] = isp; } else ISPS.push(isp);
+  addMarker(isp);
+  return isp;
+}
+
+// discovery agent
+const dmodal = $("dmodal");
+let found = [];
+$("openDiscover").onclick = () => { dmodal.classList.add("show"); $("dcode").value = sessionStorage.getItem("slp-code") || ""; $("da").focus(); };
+$("dcancel").onclick = () => dmodal.classList.remove("show");
+function ticker(el, steps, every) {
+  const t0 = Date.now();
+  const h = setInterval(() => { const sec = Math.round((Date.now() - t0) / 1000); el.textContent = `${steps[Math.min(steps.length - 1, Math.floor(sec / every))]}… ${sec}s`; }, 500);
+  return () => { clearInterval(h); return Math.round((Date.now() - t0) / 1000); };
+}
+$("dgo").onclick = async () => {
+  const area = $("da").value.trim(), code = $("dcode").value.trim();
+  if (!area) { $("da").focus(); return; }
+  $("dgo").disabled = true; $("dresearch").disabled = true; $("dlist").innerHTML = "";
+  const stop = ticker($("dstatus"), ["Searching state grant records", "Checking county broadband pages", "Reading provider websites", "Removing big carriers", "Writing the list"], 20);
+  try {
+    const data = await post("api/discover", { area, code, exclude: ISPS.map(x => x.name) });
+    sessionStorage.setItem("slp-code", code);
+    found = data.isps;
+    const sec = stop();
+    $("dstatus").textContent = found.length ? `Found ${found.length} small providers in ${data.area} in ${sec}s. Pick which ones to research.` : `No new small providers found in ${data.area}.`;
+    $("dlist").innerHTML = found.map((f, k) => `<label class="drow"><input type="checkbox" data-k="${k}" checked>
+      <span><b>${esc(f.name)}</b> <span class="meta">${esc(f.type)}${f.hq_town ? " · " + esc(f.hq_town) : ""}${f.verified ? "" : " · verify"}</span><br><span class="why">${esc(f.why_listed)}</span>
+      ${f.source ? ` <a href="${esc(f.source)}" target="_blank" rel="noopener">source</a>` : ""}</span><span class="dstate" id="ds${k}"></span></label>`).join("");
+    $("dresearch").disabled = !found.length;
+  } catch (e) { stop(); $("dstatus").textContent = e.message; }
+  finally { $("dgo").disabled = false; }
+};
+$("dresearch").onclick = async () => {
+  const code = $("dcode").value.trim() || getCode();
+  const picks = [...$("dlist").querySelectorAll("input:checked")].map(x => +x.dataset.k);
+  if (!picks.length) return;
+  $("dresearch").disabled = true; $("dgo").disabled = true;
+  let done = 0, ok = 0;
+  const queue = picks.slice();
+  const worker = async () => {
+    while (queue.length) {
+      const k = queue.shift(), f = found[k];
+      $("ds" + k).textContent = "Researching…";
+      try { const isp = await researchOne(`${f.name}${f.website ? " (" + f.website + ")" : ""}${f.hq_town ? ", " + f.hq_town : ""}`, code); $("ds" + k).textContent = `Fit ${isp._score.total}`; ok++; render(); }
+      catch (e) { $("ds" + k).textContent = "Couldn't research"; }
+      done++; $("dstatus").textContent = `Researched ${done} of ${picks.length}…`;
+    }
+  };
+  await Promise.all([worker(), worker(), worker()]);
+  $("dstatus").textContent = `Done. ${ok} new profiles added to the map and list.`;
+  $("dgo").disabled = false;
+  toast(`${ok} ISPs added from discovery`);
+};
+
+// live research
+const modal = $("modal");
+$("openResearch").onclick = () => { modal.classList.add("show"); $("rcode").value = sessionStorage.getItem("slp-code") || ""; $("rq").focus(); };
+$("rcancel").onclick = () => modal.classList.remove("show");
+let busy = false;
+$("rgo").onclick = async () => {
+  if (busy) return;
+  const query = $("rq").value.trim(), code = $("rcode").value.trim();
+  if (!query) { $("rq").focus(); return; }
+  busy = true; $("rgo").disabled = true;
+  const t0 = Date.now();
+  const steps = ["Searching the web", "Reading the company's website", "Checking grant records and local news", "Writing the profile"];
+  const tick = setInterval(() => {
+    const sec = Math.round((Date.now() - t0) / 1000);
+    $("rstatus").textContent = `${steps[Math.min(steps.length - 1, Math.floor(sec / 15))]}… ${sec}s`;
+  }, 500);
+  try {
+    const isp = await researchOne(query, code);
+    sessionStorage.setItem("slp-code", code);
+    modal.classList.remove("show"); $("rq").value = ""; $("rstatus").textContent = "";
+    render(); select(isp._id);
+    toast(`${isp.name} researched in ${Math.round((Date.now() - t0) / 1000)}s`);
+  } catch (e) {
+    $("rstatus").textContent = e.message;
+  } finally { clearInterval(tick); busy = false; $("rgo").disabled = false; }
+};
+
+SLP.sampleBar($("sampleBar"));
+render();
+const topIsp = ISPS.slice().sort((a, b) => b._score.total - a._score.total)[0];
+if (topIsp) { $("navPartner").href = SLP.partnerUrl(topIsp); }
+const pre = decodeURIComponent(location.hash.slice(1));
+if (pre && ISPS.some(i => i._id === pre)) select(pre);
+</script>
+</body>
+</html>
