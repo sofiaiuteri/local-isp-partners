@@ -32,9 +32,19 @@
 </section>
 
 <section class="section dash">
+  <div class="eyebrow caps">Official count · FCC National Broadband Map</div>
+  <h2>How many small providers there really are</h2>
+  <p class="intro">From the FCC's Broadband Data Collection, where every provider reports which homes it can serve. "Small" here means covering 25,000 homes or fewer. Homes covered isn't the same as customers, but it's the best public measure of size.</p>
+  <div class="tiles" id="fccTiles"></div>
+  <div class="funnel" id="fccBuckets" aria-label="US fixed broadband providers by number of homes covered"></div>
+  <p class="note-sm" id="fccVa"></p>
+  <p class="note-sm" id="fccSrc"></p>
+</section>
+
+<section class="section dash">
   <div class="eyebrow caps">Rollout model</div>
   <h2>What a national rollout could deliver</h2>
-  <p class="intro">Starts from the ~2,500 small US ISPs and the ~1.5 to 2 million customers they serve. Every rate below is an assumption you can change. The Virginia pilot's job is to replace these guesses with real numbers.</p>
+  <p class="intro">Starts from the 1,458 small fixed-broadband providers in the FCC's data. Every rate below is an assumption you can change. The Virginia pilot's job is to replace these guesses with real numbers.</p>
   <div class="model">
     <div class="sliders" id="sliders"></div>
     <div>
@@ -49,6 +59,7 @@
 <div class="disclaimer">Concept prototype by Sofia Iuteri. Not affiliated with or endorsed by SpaceX or Starlink. All projections are illustrative.</div>
 
 <script src="data/isps.js"></script>
+<script src="data/fcc.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/tour.js"></script>
 <script>
@@ -105,9 +116,24 @@ if (replies.length) {
 
 SLP.sampleBar(document.getElementById("sampleBar"));
 
+// ---- FCC official count ----
+if (window.FCC) {
+  const n = FCC.national, v = FCC.virginia;
+  tiles($("fccTiles"), [
+    [num(n.fixed_providers), "Fixed-broadband providers in the US"],
+    [num(n.small_providers), "Small ones (25,000 homes or fewer)"],
+    [(n.small_locations / 1e6).toFixed(1) + "M", "Homes those small providers cover"],
+    [num(n.small_wireless), "Small providers using fixed wireless"],
+  ]);
+  funnel($("fccBuckets"), n.buckets.map(b => ({ label: b[0] + " homes", v: b[1] })));
+  $("fccBuckets").querySelectorAll(".fval span").forEach(e => e.textContent = "");
+  $("fccVa").textContent = `Virginia: ${v.fixed_providers} providers, ${v.small_providers} of them small. ${v.small_researched} are researched in the console, plus 3 found by our agent that aren't in the FCC data at all. The rest are in the console's FCC list, one click from a full profile.`;
+  $("fccSrc").textContent = "Source: " + FCC.source + ".";
+}
+
 // ---- Rollout model ----
 const S = [
-  { k: "isps", label: "Small ISPs reached", min: 100, max: 2500, step: 50, v: 2500, f: v => num(v) },
+  { k: "isps", label: "Small ISPs reached (FCC count: 1,458)", min: 50, max: 2500, step: 1, v: (window.FCC?.national.small_providers || 1458), f: v => num(v) },
   { k: "reply", label: "Reply rate", min: 2, max: 50, step: 1, v: 15, f: v => v + "%" },
   { k: "call", label: "Replies that take a call", min: 10, max: 100, step: 5, v: 50, f: v => v + "%" },
   { k: "sign", label: "Calls that sign", min: 5, max: 100, step: 5, v: 40, f: v => v + "%" },

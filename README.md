@@ -2,7 +2,7 @@
 
 A working concept for signing up the long tail of small internet providers as satellite-internet partners, with AI agents doing the research, outreach and onboarding work that doesn't scale by hand.
 
-About 2,500 small, independent ISPs serve rural America. Each one has a list of homes its towers or fiber can't reach. They're too small for a traditional reseller program and too many to sign one sales call at a time. This prototype shows how an agent-driven program could reach them county by county, starting with a Virginia pilot.
+About 1,500 small, independent ISPs serve rural America (1,458 fixed-broadband providers covering 25,000 homes or fewer in FCC data). Each one has a list of homes its towers or fiber can't reach. They're too small for a traditional reseller program and too many to sign one sales call at a time. This prototype shows how an agent-driven program could reach them county by county, starting with a Virginia pilot.
 
 > Independent concept by Sofia Iuteri. Not affiliated with or endorsed by SpaceX or Starlink. ISP details come from public sources; program terms and earnings figures are illustrative.
 

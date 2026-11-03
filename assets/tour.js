@@ -10,6 +10,8 @@
       text: "17 real Virginia ISPs, researched from public sources and placed on a terrain map. Brighter dots are better fits. The sample pipeline is loaded, so some are already in progress." },
     { page: "console.html", el: "#openDiscover", title: "Discovery agent",
       text: "Type any county or state and the agent searches grant records, county pages and company sites for the small providers there, skipping the big carriers. Pick the ones worth a full profile." },
+    { page: "console.html", el: "#rows", click: "#lFcc", title: "The official FCC list",
+      text: "The FCC list shows all 32 small Virginia providers in federal broadband data, with homes covered and counties. One click researches any of them. The agent also finds ISPs the FCC data misses, like Piedmont Broadband." },
     { page: "console.html#piedmont-broadband", el: "#detail", title: "Research, score, draft",
       text: "Every ISP gets a sourced profile, a fit score with the reasons behind it, and an email that opens with something true about their business. A person approves before anything sends." },
     { page: "console.html#b2x-online-inc", el: "#rout", title: "Reply agent",
@@ -23,7 +25,7 @@
     { page: "dashboard.html", el: "#liveFunnel", title: "Pipeline dashboard",
       text: "Everything above rolls up here: researched, contacted, replied, call, onboarding, live, plus how the agent sorted every reply." },
     { page: "dashboard.html", el: ".model", title: "The national picture",
-      text: "Starting from about 2,500 small US ISPs, change any rate to see what a rollout could deliver. The Virginia pilot's job is to replace these guesses with real numbers." },
+      text: "Starting from the FCC count of 1,458 small US providers, change any rate to see what a rollout could deliver. The Virginia pilot's job is to replace these guesses with real numbers." },
     { page: "memo.html", el: ".tldr", title: "The plan",
       text: "The memo covers why this has been hard, the offer I'd make small ISPs, and a six-week Virginia pilot. Thanks for taking the tour!" },
   ];
@@ -55,6 +57,8 @@
   function show(n) {
     const s = STEPS[n];
     document.querySelectorAll(".tour-hl").forEach(e => e.classList.remove("tour-hl"));
+    if (s.click) document.querySelector(s.click)?.click();
+    else if (document.querySelector("#lOurs") && !document.querySelector("#lOurs").classList.contains("on")) document.querySelector("#lOurs").click();
     const el = document.querySelector(s.el);
     if (el) { el.classList.add("tour-hl"); el.scrollIntoView({ behavior: "smooth", block: "center" }); }
     let card = document.querySelector(".tour-card");

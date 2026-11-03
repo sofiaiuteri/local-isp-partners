@@ -42,6 +42,7 @@
         <button class="btn sm solid" id="openDiscover">Discover ISPs</button>
         <button class="btn sm" id="openResearch">Research one</button>
       </div>
+      <div class="seg full"><button id="lOurs" class="on">Researched</button><button id="lFcc">FCC list</button></div>
       <input id="q" placeholder="Search ISPs, towns, counties">
       <div class="row">
         <select id="fType"><option value="">All types</option></select>
@@ -94,6 +95,7 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="data/isps.js"></script>
+<script src="data/fcc.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/tour.js"></script>
 <script>
@@ -141,9 +143,40 @@ function visible() {
   return list;
 }
 
+let listMode = "ours";
+const fccDone = JSON.parse(localStorage.getItem("slp-fcc-done") || "{}");
+function fccRows() {
+  const F = window.FCC; if (!F) return `<div class="empty" style="padding:24px;color:var(--muted)">FCC data not loaded.</div>`;
+  const q = $("q").value.trim().toLowerCase();
+  const v = F.virginia, rows = v.providers.filter(p => p.small && (!q || (p.name + " " + p.counties.join(" ")).toLowerCase().includes(q)))
+    .sort((a, b) => (!!(a.researched || fccDone[a.id]) - !!(b.researched || fccDone[b.id])) || b.footprint - a.footprint);
+  const todo = rows.filter(p => !p.researched && !fccDone[p.id]).length;
+  return `<div class="fcc-head"><b>${v.small_providers} small providers</b> file with the FCC in Virginia. ${v.small_providers - todo} researched, <b>${todo} not yet</b>. Plus 3 we found that aren't in the FCC data at all.<div class="src">${esc(F.source)}</div></div>` +
+    rows.map(p => {
+      const done = p.researched || fccDone[p.id];
+      return `<div class="fcc-row ${done ? "done" : ""}"><div><div class="nm">${esc(p.name)}</div>
+        <div class="meta">${esc(p.tech.join(" + "))} · ${Number(p.footprint).toLocaleString()} homes covered<br>${esc(p.top.map(c => c[1] >= 1 ? `${c[0]} (${c[1]}% of homes)` : c[0]).join(" · "))}</div></div>
+        <div class="fcc-act">${done ? `<span class="ok">${fccDone[p.id] ? "Added · fit " + fccDone[p.id] : "Researched"}</span>` : `<button class="btn sm" data-pid="${p.id}">Research</button>`}</div></div>`;
+    }).join("");
+}
+function wireFcc() {
+  $("rows").querySelectorAll("[data-pid]").forEach(b => b.onclick = async () => {
+    const p = FCC.virginia.providers.find(x => x.id === b.dataset.pid);
+    const code = getCode(); if (!code) return;
+    b.disabled = true; b.textContent = "Researching…";
+    try {
+      const isp = await researchOne(`${p.name}, internet provider serving ${p.counties.slice(0, 3).join(", ")}, Virginia`, code);
+      fccDone[p.id] = isp._score.total; localStorage.setItem("slp-fcc-done", JSON.stringify(fccDone));
+      toast(`${isp.name} researched and added to the map`);
+    } catch (e) { b.disabled = false; b.textContent = "Research"; toast(e.message); }
+    render();
+  });
+}
+
 function render() {
   const list = visible();
-  $("rows").innerHTML = list.map(i => {
+  if (listMode === "fcc") { $("rows").innerHTML = fccRows(); wireFcc(); }
+  else $("rows").innerHTML = list.map(i => {
     const st = SLP.stageOf(i, stages);
     return `<div class="isp-row ${selected === i._id ? "on" : ""}" data-id="${i._id}">
       <div class="nm">${esc(i.name)}</div>
@@ -152,6 +185,7 @@ function render() {
     </div>`;
   }).join("") || `<div class="empty" style="padding:24px;color:var(--muted)">No ISPs match those filters.</div>`;
   $("rows").querySelectorAll(".isp-row").forEach(r => r.onclick = () => select(r.dataset.id));
+  ["fType", "fRegion", "fStage", "fSort"].forEach(id => $(id).parentElement.style.display = listMode === "fcc" ? "none" : "");
 
   const ids = new Set(list.map(i => i._id));
   ISPS.forEach(i => { const m = markers[i._id]; if (!m) return; ids.has(i._id) ? m.addTo(map) : m.remove(); });
@@ -258,6 +292,8 @@ function select(id) {
 
 function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2600); }
 
+$("lOurs").onclick = () => { listMode = "ours"; $("lOurs").classList.add("on"); $("lFcc").classList.remove("on"); render(); };
+$("lFcc").onclick = () => { listMode = "fcc"; $("lFcc").classList.add("on"); $("lOurs").classList.remove("on"); render(); };
 $("vMap").onclick = () => { $("vMap").classList.add("on"); $("vBoard").classList.remove("on"); $("board").classList.remove("show"); setTimeout(() => map.invalidateSize(), 50); };
 $("vBoard").onclick = () => { $("vBoard").classList.add("on"); $("vMap").classList.remove("on"); $("board").classList.add("show"); };
 
